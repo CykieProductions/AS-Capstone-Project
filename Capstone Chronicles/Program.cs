@@ -34,35 +34,30 @@ https://www.youtube.com/watch?v=qAWhGEPMlS8
 ----------------------------------------------------------------------------------------------------------------------------
  */
 
+using Capstone_Chronicles.GUI;
 using static System.Console;
 
 namespace Capstone_Chronicles
 {
     internal static class Program
     {
-        //x static bool gameIsRunning = true;
+        public static bool GameIsRunning { get; private set; } = true;
 
         static void Main(string[] args)
         {
-            var options = new Button[] {
-            new Button("Start", () =>
-            {
-                Beep(100, 60);
-            }),
-            new Button("Options", () =>
-            {
-                Beep(150, 160);
-            }),
-            new Button("Exit", () =>
-            {
-                Beep(250, 20);
-            })
-            };
-            Screen titleScreen = new Screen(new Menu("Capstone Chronicles", options));
+            GameManager.ChangeScene(GameManager.SceneFactory.TitleScreen);
 
-            titleScreen.Refresh();
+            //This means the game stopped without properly exiting
+            if (GameIsRunning)
+            {
+                WriteLine("The program has ended unexpectedly...");
+                ReadKey();
+            }
+        }
 
-            ReadKey();
+        public static void Exit()
+        {
+            GameIsRunning = false;
         }
     }
 
