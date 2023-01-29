@@ -12,12 +12,12 @@ namespace Capstone_Chronicles
     internal class BattleScene : Scene
     {
         static Hero curHero = HeroManager.Party[0];
-        static List<Enemy> enemies;
+        static List<Enemy> enemies = new();
         static int i2 = 0;
 
         //GUI
         static Menu actionMenu = new Menu(
-            new Label(() =>
+            new Label(dynamicText: () =>
                 {
                     actionMenu.Prompt.Text = "What will {0} do?\nHP: {1}/{2} | SP: {3}/{4}";
                     actionMenu.Prompt.SetText(actionMenu.Prompt.Text, 
@@ -27,7 +27,7 @@ namespace Capstone_Chronicles
             {
                 new Button("Attack", menu =>
                 {
-                    enemies[i2].ModifyHP(-curHero.Attack);
+                    enemies[i2].ModifyHealth(-curHero.Attack, atkElmt: ElementManager.NORMAL);
                 })
             });
         //
@@ -38,8 +38,11 @@ namespace Capstone_Chronicles
             enemies = inEnemies.ToList();
 
             AddGUIElement(actionMenu, false);
+        }
 
-            //Must come last
+        public override void Start()
+        {
+            base.Start();
             RunBattle();
         }
 
@@ -60,16 +63,18 @@ namespace Capstone_Chronicles
                 if (HeroManager.Party[i].Hp > 0)
                     heroes.Add(HeroManager.Party[i]);
             }
+            curHero = heroes[0];
 
             //actionMenu.Prompt.UpdateData(curHero);
             actionMenu.Enabled = true;
             Refresh();
             
-            heroes[0].ModifyHP(-enemies[0].Attack);
+            heroes[0].ModifyHealth(-enemies[0].Attack);
             enemies.RemoveAll(x => x.Hp <= 0);
+            heroes.RemoveAll(x => x.Hp <= 0);
             //curHero = HeroManager.Party[1];
 
-            if (enemies.Count == 0)
+            if (enemies.Count == 0 || heroes.Count == 0)
                 return false;
             return true;
         }

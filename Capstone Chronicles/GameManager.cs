@@ -15,6 +15,7 @@ namespace Capstone_Chronicles
             Exploring, Battling
         }
 
+        public static State gameState;
         public static Scene? CurrentScene { get; private set; }
         /// <summary> The GUI element currently recieving input </summary>
         public static InteractiveGUI? ActiveInteractiveElement { get; set; }

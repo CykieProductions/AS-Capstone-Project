@@ -59,7 +59,7 @@ namespace Capstone_Chronicles
         /// <summary>
         /// Called when the scene is first switched to
         /// </summary>
-        public void Start()
+        public virtual void Start()
         {
             Refresh();
             OnStart?.Invoke();
@@ -68,7 +68,7 @@ namespace Capstone_Chronicles
         /// <summary>
         /// Called right before the scene is switched.
         /// </summary>
-        public void Exit()
+        public virtual void Exit()
         {
             OnExit?.Invoke();
         }

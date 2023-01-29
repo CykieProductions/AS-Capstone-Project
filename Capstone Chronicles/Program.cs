@@ -34,7 +34,7 @@ https://www.youtube.com/watch?v=qAWhGEPMlS8
 ----------------------------------------------------------------------------------------------------------------------------
  */
 
-using Capstone_Chronicles.GUI;
+using System.Numerics;
 using static System.Console;
 
 namespace Capstone_Chronicles
@@ -59,37 +59,76 @@ namespace Capstone_Chronicles
         {
             GameIsRunning = false;
         }
+
+        [Obsolete("This will only work in debug mode. Use a Label for actual text!", false)]
+        public static void print<T>(T message, bool singleLine = false)
+        {
+#if DEBUG
+            Write("DEBUG: " + message + (singleLine ? null : '\n'));
+#endif
+        }
     }
 
-    public struct ColorSet
+    public static class RNG
     {
-        public const ConsoleColor DEFAULT_TEXT_COLOR = ConsoleColor.White;
-        public const ConsoleColor DEFAULT_BACK_COLOR = ConsoleColor.Black;
-        public static ColorSet Normal { get => new ColorSet(DEFAULT_TEXT_COLOR, DEFAULT_BACK_COLOR); }
-        public static ColorSet Inverse { get => new ColorSet(DEFAULT_BACK_COLOR, DEFAULT_TEXT_COLOR); }
+        public static Random Rand { get; private set; } = new Random(DateTime.Now.Millisecond);
 
+        // Presets
+        public static bool OneInTwo { get => Chance(0.5f); }
+        public static bool OneInFour { get => Chance(0.25f); }
+        public static bool ThreeInFour { get => Chance(0.75f); }
+        public static bool OneInThree { get => Chance(1 / 3); }
+        public static bool TwoInThree { get => Chance(2 / 3); }
 
-        public ConsoleColor foreground = DEFAULT_TEXT_COLOR;
-        public ConsoleColor background = DEFAULT_BACK_COLOR;
-
-        public ColorSet(ConsoleColor inForeColor = DEFAULT_TEXT_COLOR, ConsoleColor inBackColor = DEFAULT_BACK_COLOR)
+        /*x// <summary>
+        /// Runs a check based on percent chance out of 100
+        /// </summary>
+        /// <param name="percentage">Between 0 and 100 (inclusive)</param>
+        public static bool Chance(int percentage)
         {
-            foreground = inForeColor;
-            background = inBackColor;
+            //Ensures 0 will always fail and 100 will always succeed
+            var rVal = Rand.Next(1, 101);
+
+            if (rVal <= percentage)//Success condition
+                return true;
+
+            return false;
+        }*/
+
+        /// <summary>
+        /// Runs a check based on percentage
+        /// </summary>
+        /// <param name="percentage">Between 0 and 1 (inclusive)</param>
+        public static bool Chance(float percentage)
+        {
+            //Ensures 0 will always fail and 100 will always succeed
+            var rVal = Rand.NextSingle() + float.Epsilon;
+
+            if (rVal <= percentage)//Success condition
+                return true;
+
+            return false;
         }
 
-        public static implicit operator ColorSet((ConsoleColor, ConsoleColor) value)
+        /// <summary>
+        /// Returns a random integer between to inclusive values
+        /// </summary>
+        public static int RandomInt(int inclusiveMin, int inclusiveMax)
         {
-            return new ColorSet(value.Item1, value.Item2);
+            if (inclusiveMin <= inclusiveMax)
+                throw new ArgumentOutOfRangeException("Arguments must create a valid range!");
+
+            return Rand.Next(inclusiveMin, inclusiveMax + 1);
         }
     }
+
 
     /// <summary>
-    /// A class to contain all extention methods for this project
+    /// A class to contain all extension methods for this project
     /// </summary>
     public static class Extentions
     {
-        //! String Extentions
+        //! String Extensions
         /// <summary>
         /// Repeats the target string a number of times and returns it
         /// </summary>
@@ -107,7 +146,7 @@ namespace Capstone_Chronicles
         }
         
 
-        //! Char Extentions
+        //! Char Extensions
         /// <summary>
         /// Copies the target char a number of times and returns it as a string
         /// </summary>
@@ -116,6 +155,51 @@ namespace Capstone_Chronicles
         {
             return new string(value, count);
         }
-        
+
+        //! Number Extensions
+        /// <summary>
+        /// Clamps any valid *number* between the min and max *number*
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="min">Inclusive minimum</param>
+        /// <param name="max">Inclusive maximum</param>
+        /// <returns></returns>
+        public static T Clamp<T>(this T value, T min, T max)
+        {
+            if (value is not int && value is not float)
+                throw new ArgumentException("Generic Type <T> must be a number!");
+            
+            dynamic v = value;
+
+            if (v > max)
+                v = max;
+            else if (v < min)
+                v = min;
+
+            return v;
+        }
+
+        //https://stackoverflow.com/questions/56692/random-weighted-choice
+        public static T RandomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, float> weightSelector)
+        {
+            float totalWeight = sequence.Sum(weightSelector);
+            // The weight we are after...
+            float itemWeightIndex = (float)new Random().NextDouble() * totalWeight;
+            float currentWeightIndex = 0;
+
+            foreach (var item in from weightedItem in sequence select new { Value = weightedItem, Weight = weightSelector(weightedItem) })
+            {
+                currentWeightIndex += item.Weight;
+
+                // If we've hit or passed the weight we are after for this item then it's the one we want....
+                if (currentWeightIndex >= itemWeightIndex)
+                    return item.Value;
+
+            }
+
+            return default(T);
+
+        }
     }
 }
