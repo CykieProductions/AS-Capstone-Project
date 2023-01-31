@@ -60,6 +60,7 @@ namespace Capstone_Chronicles
         public static Element ELECTRIC { get; private set; } = new Element(Element.Name.ELECTRIC);
         #endregion
 
+        //Static constructor to initialize the strengths and weaknesses of all above elements
         static ElementManager()
         {
             /// <summary>
@@ -153,7 +154,6 @@ namespace Capstone_Chronicles
                 );
         }
 
-        public const float UNFAZED_MULT = float.NegativeInfinity;
         public const float BONUS_MULT = 1.75f;
         public const float REDUCED_MULT = 0.5f;
         public const float USELESS_MULT = 0f;
@@ -164,7 +164,7 @@ namespace Capstone_Chronicles
 
             if (target.Element.IsUnfazedBy(attackElement))//For special elements only
             {
-                mult = UNFAZED_MULT;
+                mult = USELESS_MULT;
             }
             else if (attackElement.IsEffectiveAgainst(target.Element))
             {
@@ -219,9 +219,8 @@ namespace Capstone_Chronicles
         }
 
         /// <summary>
-        /// Fills in strengths and weaknesses for the static elements.
+        /// Fills in strengths and weaknesses for the static elements ONLY.
         /// </summary>
-        /// <param name="inName"></param>
         /// <param name="effectiveAgainst">Elements that I do bonus damage to</param>
         /// <param name="ineffectiveAgainst">Elements that I do reduced damage to</param>
         /// <param name="uselessAgainst">Elements that I can't affect</param>

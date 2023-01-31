@@ -16,11 +16,11 @@ namespace Capstone_Chronicles
                         ChangeScene(GetBattleScene());
                     }, false);
 
-                    var options = new Button[] {
+                    var options = new List<Button>() {
                     new Button("Start", (menu) =>
                     {
                         Console.Beep(100, 60);
-                        nameField.Enabled = true;
+                        nameField.SetActive(true, false);
                     }),
                     new Button("Options", (menu) =>
                     {
@@ -47,7 +47,7 @@ namespace Capstone_Chronicles
 
                 //The components are filled out by the BattleScene itself
                 //Switching to this scene will automatically trigger a battle
-                return new BattleScene(EnemyFactory.Test, EnemyFactory.Test);
+                return new BattleScene(EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test);
             }
         }
     }

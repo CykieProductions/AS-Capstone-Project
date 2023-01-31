@@ -15,126 +15,126 @@ namespace Capstone_Chronicles
         public static SkillBase requestedSkill;
 
         #region All Skills
-        public static Skill<Actor> Skip_Turn{ get; private set; }
-        public static Skill<Actor> Sleep{ get; private set; }
-        public static Skill<Actor> Immobile{ get; private set; }
-        public static Skill<Actor> Waste_Stare{ get; private set; }
-        public static Skill<Actor> Waste_Roar{ get; private set; }
-        public static Skill<Actor> Waste_Short_Circut{ get; private set; }
-        public static Skill<Actor> Waste_Jumping{ get; private set; }
+        public static Skill<Actor> Skip_Turn { get; private set; }
+        public static Skill<Actor> Sleep { get; private set; }
+        public static Skill<Actor> Immobile { get; private set; }
+        public static Skill<Actor> Waste_Stare { get; private set; }
+        public static Skill<Actor> Waste_Roar { get; private set; }
+        public static Skill<Actor> Waste_Short_Circut { get; private set; }
+        public static Skill<Actor> Waste_Jumping { get; private set; }
 
 
-        public static Skill<Actor, Actor> Poison_Powder{ get; private set; }
-        public static Skill<Actor, List<Actor>> Poison_Cloud{ get; private set; }
+        public static Skill<Actor, Actor> Poison_Powder { get; private set; }
+        public static Skill<Actor, List<Actor>> Poison_Cloud { get; private set; }
 
         //Testing
-        public static Skill<Actor, List<Actor>> Damage_Allies_Test{ get; private set; }
-        public static Skill<Actor, List<Actor>> Poison_Allies_Test{ get; private set; }
-        public static Skill<Actor, List<Actor>> Ignite_Allies_Test{ get; private set; }
-        public static Skill<Actor, List<Actor>> Restore_SP_Allies_Test{ get; private set; }
+        public static Skill<Actor, List<Actor>> Damage_Allies_Test { get; private set; }
+        public static Skill<Actor, List<Actor>> Poison_Allies_Test { get; private set; }
+        public static Skill<Actor, List<Actor>> Ignite_Allies_Test { get; private set; }
+        public static Skill<Actor, List<Actor>> Restore_SP_Allies_Test { get; private set; }
         //
 
-        public static Skill<Actor, Actor> Attack{ get; private set; }
-        public static Skill<Actor> Guard{ get; private set; }
-        public static Skill<Actor, Actor> Scan_Lash{ get; private set; }
+        public static Skill<Actor, Actor> Attack { get; private set; }
+        public static Skill<Actor> Guard { get; private set; }
+        public static Skill<Actor, Actor> Scan_Lash { get; private set; }
 
         //Fire moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Fireball{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Flame_Burst{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Eruption{ get; private set; }
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Flare_Fall{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Blazing_Vortex{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Supernova{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Fireball { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Flame_Burst { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Eruption { get; private set; }
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Flare_Fall { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Blazing_Vortex { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Supernova { get; private set; }
 
         //Water moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Water_Pulse{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Water_Jet{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Hydo_Cannon{ get; private set; }
-        //public static Skill<Actor, Actor> Torpedo{ get; private set; }//Physical
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Waterfall{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Deluge{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Tsunami{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Water_Pulse { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Water_Jet { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Hydo_Cannon { get; private set; }
+        //public static Skill<Actor, Actor> Torpedo { get; private set; }//Physical
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Waterfall { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Deluge { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Tsunami { get; private set; }
 
         //Plant moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Vine_Whip{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Leaf_Cutter{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Needle_Tomb{ get; private set; }
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Leaf_Storm{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Root_Wave{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Thorn_Canopy{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Vine_Whip { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Leaf_Cutter { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Needle_Tomb { get; private set; }
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Leaf_Storm { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Root_Wave { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Thorn_Canopy { get; private set; }
 
         //Ground moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Pebble_Blast{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Geo_Shift{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Fissure{ get; private set; }
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Rock_Slide{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Spire_Wall{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Earthquake{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Pebble_Blast { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Geo_Shift { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Fissure { get; private set; }
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Rock_Slide { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Spire_Wall { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Earthquake { get; private set; }
 
         //Air moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Wind_Slash{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Air_Cannon{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Sonic_Boom{ get; private set; }
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Slash_Storm{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Sky_Crusher{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Hurricane{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Wind_Slash { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Air_Cannon { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Sonic_Boom { get; private set; }
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Slash_Storm { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Sky_Crusher { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Hurricane { get; private set; }
 
         //Electric moves
-        /// <summary>Level 1{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Charge_Bolt{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Taser_Grip{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit one</summary>
-        public static Skill<Actor, Actor> Ion_Overload{ get; private set; }
-        /// <summary>Level 1{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Electro_Wave{ get; private set; }
-        /// <summary>Level 2{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Tesla_Cannon{ get; private set; }
-        /// <summary>Level 3{ get; private set; } Hit all</summary>
-        public static Skill<Actor, List<Actor>> Gigawatt_Dischage{ get; private set; }
+        /// <summary>Level 1 | Hit one</summary>
+        public static Skill<Actor, Actor> Charge_Bolt { get; private set; }
+        /// <summary>Level 2 | Hit one</summary>
+        public static Skill<Actor, Actor> Taser_Grip { get; private set; }
+        /// <summary>Level 3 | Hit one</summary>
+        public static Skill<Actor, Actor> Ion_Overload { get; private set; }
+        /// <summary>Level 1 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Electro_Wave { get; private set; }
+        /// <summary>Level 2 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Tesla_Cannon { get; private set; }
+        /// <summary>Level 3 | Hit all</summary>
+        public static Skill<Actor, List<Actor>> Gigawatt_Dischage { get; private set; }
 
         //Healing
-        public static Skill<Actor, Actor> Healing_Powder{ get; private set; }
-        public static Skill<Actor, Actor> Super_Healing_Powder{ get; private set; }
-        public static Skill<Actor, Actor> Ultra_Healing_Powder{ get; private set; }
-        public static Skill<Actor, List<Actor>> Healing_Cloud{ get; private set; }
-        public static Skill<Actor, List<Actor>> Ultra_Healing_Cloud{ get; private set; }
+        public static Skill<Actor, Actor> Healing_Powder { get; private set; }
+        public static Skill<Actor, Actor> Super_Healing_Powder { get; private set; }
+        public static Skill<Actor, Actor> Ultra_Healing_Powder { get; private set; }
+        public static Skill<Actor, List<Actor>> Healing_Cloud { get; private set; }
+        public static Skill<Actor, List<Actor>> Ultra_Healing_Cloud { get; private set; }
 
-        public static Skill<Actor, Actor> Curing_Powder{ get; private set; }
-        public static Skill<Actor, List<Actor>> Curing_Cloud{ get; private set; }
-        public static Skill<Actor, Actor> Pheonix_Powder{ get; private set; }
-        public static Skill<Actor, Actor> Ultra_Pheonix_Powder{ get; private set; }
-        public static Skill<Actor, List<Actor>> Pheonix_Cloud{ get; private set; }
+        public static Skill<Actor, Actor> Curing_Powder { get; private set; }
+        public static Skill<Actor, List<Actor>> Curing_Cloud { get; private set; }
+        public static Skill<Actor, Actor> Phoenix_Powder { get; private set; }
+        public static Skill<Actor, Actor> Ultra_Phoenix_Powder { get; private set; }
+        public static Skill<Actor, List<Actor>> Pheonix_Cloud { get; private set; }
         #endregion
 
 
@@ -367,9 +367,9 @@ namespace Capstone_Chronicles
                     print($"{user.Name} produced {curSkill.Name}");
 
                     int amount = RNG.RandomInt(1, 3);
-                    target.ModifyHealth(-amount, curSkill);
+                    int actual = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(4 / 5))
+                    if (actual < 0 && RNG.Chance(4f / 5))//Use must actually do damage
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         StatusEffectManager.POISONED.TryInflict(target);
@@ -393,9 +393,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = RNG.RandomInt(1, 3);
-                        target.ModifyHealth(-amount, curSkill);
+                        int actual = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(2 / 3))
+                        if (actual < 0 && RNG.Chance(2f / 3))
                         {
                             Console.ForegroundColor = ConsoleColor.Magenta;
                             StatusEffectManager.POISONED.TryInflict(target);
@@ -416,7 +416,7 @@ namespace Capstone_Chronicles
             {
                 print($"{user.Name} attacked {target.Name}");
                 //user.Attack(target);
-                target.ModifyHealth(-BasicAttackFormula(user, 1));
+                target.ModifyHealth(-BasicAttackFormula(user, 1), Attack);
             }
             , 0, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT);
 
@@ -430,9 +430,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 6))
+                    if (amount < 0 && RNG.Chance(1f / 6))
                         StatusEffectManager.FLAMING.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -451,9 +451,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user, 2);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 6))
+                    if (amount < 0 && RNG.Chance(1f / 6))
                         StatusEffectManager.FLAMING.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -472,9 +472,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user, 3);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 3))
+                    if (amount < 0 && RNG.Chance(1f / 3))
                         StatusEffectManager.FLAMING.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -496,9 +496,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 1);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 8))
+                        if (amount < 0 && RNG.Chance(1f / 8))
                             StatusEffectManager.FLAMING.TryInflict(target);
                     }
 
@@ -520,9 +520,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 2);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 4))
+                        if (amount < 0 && RNG.Chance(1f / 4))
                             StatusEffectManager.FLAMING.TryInflict(target);
                     }
 
@@ -544,9 +544,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 3);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 2))
+                        if (amount < 0 && RNG.Chance(1f / 2))
                             StatusEffectManager.FLAMING.TryInflict(target);
                     }
 
@@ -590,7 +590,7 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.WATER);
 
-            Hydo_Cannon = new Skill<Actor, Actor>("Hydo Cannon", (user, target) =>
+            Hydo_Cannon = new Skill<Actor, Actor>("Hydro Cannon", (user, target) =>
             {
                 var curSkill = Hydo_Cannon;
                 if (user.Sp >= curSkill.Cost)
@@ -599,11 +599,11 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = (int)(SpecialAttackFormula(user, 3) * 0.75f);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (!target.isGuarding && RNG.Chance(1 / 3))
+                    if (!target.isGuarding && amount < 0 && RNG.Chance(1f / 3))
                         StatusEffectManager.CONFUSED.TryInflict(target);
 
-                    target.ModifyHealth(-amount, curSkill);
 
                     user.Sp -= curSkill.Cost;
                 }
@@ -662,11 +662,11 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = (int)(SpecialAttackFormula(user, 3) * 0.75f);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 3))
+                        if (amount < 0 && RNG.Chance(1f / 3))
                             StatusEffectManager.CONFUSED.TryInflict(target);
 
-                        target.ModifyHealth(-amount, curSkill);
                     }
 
                     user.Sp -= curSkill.Cost;
@@ -719,11 +719,11 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = (int)(SpecialAttackFormula(user, 1) * 0.75 + BasicAttackFormula(user, 3));
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 5))
+                    if (amount < 0 && RNG.Chance(1f / 5))
                         StatusEffectManager.PARALYZED.TryInflict(target);
 
-                    target.ModifyHealth(-amount, curSkill);
 
                     user.Sp -= curSkill.Cost;
                 }
@@ -781,10 +781,11 @@ namespace Capstone_Chronicles
 
                     foreach (var target in targets)
                     {
-                        if (RNG.Chance(1 / 5))
-                            StatusEffectManager.PARALYZED.TryInflict(target);
                         int amount = (int)(SpecialAttackFormula(user, 1) * 0.75 + BasicAttackFormula(user, 3));
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
+
+                        if (amount < 0 && RNG.Chance(1f / 5))
+                            StatusEffectManager.PARALYZED.TryInflict(target);
                     }
 
                     user.Sp -= curSkill.Cost;
@@ -801,7 +802,7 @@ namespace Capstone_Chronicles
                 var curSkill = Pebble_Blast;
                 if (user.Sp >= curSkill.Cost)
                 {
-                    print($"{user.Name} used {curSkill.Name}");
+                    print($"{user.Name} used {curSkill.Name}", true);
 
                     int total = 0;
                     for (int i = 0; i < 6; i++)//can hit 6 times
@@ -812,7 +813,7 @@ namespace Capstone_Chronicles
                             total += amount;
                             target.ModifyHealth(-amount, curSkill);
                         }
-                        else if (RNG.Chance(1 / 2))
+                        else if (RNG.Chance(1f / 2))
                         {
                             total += amount;
                             target.ModifyHealth(-amount, curSkill);
@@ -882,7 +883,7 @@ namespace Capstone_Chronicles
                                 total += amount;
                                 target.ModifyHealth(-amount, curSkill);
                             }
-                            else if (RNG.Chance(1 / 2))
+                            else if (RNG.Chance(1f / 2))
                             {
                                 total += amount;
                                 target.ModifyHealth(-amount, curSkill);
@@ -1035,9 +1036,9 @@ namespace Capstone_Chronicles
             }
             , 14, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.AIR);
 
-            Hurricane = new Skill<Actor, List<Actor>>("Tsunami", (user, targets) =>
+            Hurricane = new Skill<Actor, List<Actor>>("Hurricane", (user, targets) =>
             {
-                var curSkill = Tsunami;
+                var curSkill = Hurricane;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1067,9 +1068,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 6))
+                    if (amount < 0 && RNG.Chance(1f / 6))
                         StatusEffectManager.PARALYZED.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -1088,9 +1089,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user, 2);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 4))
+                    if (amount < 0 && RNG.Chance(1f / 4))
                         StatusEffectManager.PARALYZED.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -1109,9 +1110,9 @@ namespace Capstone_Chronicles
 
                     //int amount = (int)(50 * (user.specialAttack / 15f)).Clamp(12, int.MaxValue);
                     int amount = SpecialAttackFormula(user, 3);
-                    target.ModifyHealth(-amount, curSkill);
+                    amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (RNG.Chance(1 / 2))
+                    if (amount < 0 && RNG.Chance(1f / 3))
                         StatusEffectManager.PARALYZED.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -1133,9 +1134,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 1);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 6))
+                        if (amount < 0 && RNG.Chance(1f / 6))
                             StatusEffectManager.PARALYZED.TryInflict(target);
                     }
 
@@ -1157,9 +1158,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 2);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 4))
+                        if (amount < 0 && RNG.Chance(1f / 4))
                             StatusEffectManager.PARALYZED.TryInflict(target);
                     }
 
@@ -1181,9 +1182,9 @@ namespace Capstone_Chronicles
                     foreach (var target in targets)
                     {
                         int amount = SpecialAttackFormula(user, 3);
-                        target.ModifyHealth(-amount, curSkill);
+                        amount = target.ModifyHealth(-amount, curSkill);
 
-                        if (RNG.Chance(1 / 2))
+                        if (amount < 0 && RNG.Chance(1f / 2))
                             StatusEffectManager.PARALYZED.TryInflict(target);
                     }
 
@@ -1344,9 +1345,9 @@ namespace Capstone_Chronicles
             , 22, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.CURING);
 
 
-            Pheonix_Powder = new Skill<Actor, Actor>("Pheonix Powder", (user, target) =>
+            Phoenix_Powder = new Skill<Actor, Actor>("Phoenix Powder", (user, target) =>
             {
-                var curSkill = Pheonix_Powder;
+                var curSkill = Phoenix_Powder;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} produced {curSkill.Name}");
@@ -1360,9 +1361,9 @@ namespace Capstone_Chronicles
             , 20, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
 
             //Revive to full health 
-            Ultra_Pheonix_Powder = new Skill<Actor, Actor>("Ultra Pheonix Powder", (user, target) =>
+            Ultra_Phoenix_Powder = new Skill<Actor, Actor>("Ultra Phoenix Powder", (user, target) =>
             {
-                var curSkill = Ultra_Pheonix_Powder;
+                var curSkill = Ultra_Phoenix_Powder;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} produced {curSkill.Name}");
@@ -1375,7 +1376,7 @@ namespace Capstone_Chronicles
             }
             , 30, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
 
-            Pheonix_Cloud = new Skill<Actor, List<Actor>>("Pheonix Cloud", (user, targets) =>
+            Pheonix_Cloud = new Skill<Actor, List<Actor>>("Phoenix Cloud", (user, targets) =>
             {
                 var curSkill = Pheonix_Cloud;
                 if (user.Sp >= curSkill.Cost)

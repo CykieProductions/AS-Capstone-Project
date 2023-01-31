@@ -41,9 +41,9 @@ namespace Capstone_Chronicles
         
         public void AddGUIElement(GUIComponent newElement, bool enabled)
         {
-            newElement.Enabled = enabled;
             newElement.SetParentScreen(this);
             elements.Add(newElement);
+            newElement.SetActive(enabled, false);
         }
 
         public void Refresh()

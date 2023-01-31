@@ -5,25 +5,20 @@ namespace Capstone_Chronicles.GUI
 
     internal abstract class GUIComponent
     {
-        protected bool enabled = true;
-        public bool Enabled 
-        { 
-            get => enabled; 
-
-            set
-            { 
-                enabled = value;
-                //TODO Why does this cause errors?
-                //x ParentScreen.Refresh();
-            } 
-        }
+        public bool Enabled { get; protected set; }
         public Scene ParentScreen { get; private set; }
 
         public GUIComponent(bool inEnabled)
         {
-            enabled = inEnabled;
+            Enabled = inEnabled;
         }
 
+        public void SetActive(bool state, bool refresh = true)
+        {
+            Enabled = state;
+            if (refresh)
+                ParentScreen.Refresh();
+        }
         public abstract void Display();
         public virtual void Display(params dynamic[] args) { Display(); }
 

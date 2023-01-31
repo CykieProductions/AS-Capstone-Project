@@ -35,7 +35,7 @@ namespace Capstone_Chronicles.GUI
         }
 
         /// <summary>
-        /// Checks if the element was succefully activated and then resets it back to default
+        /// Checks if the element was successfully activated and then resets it back to default
         /// </summary>
         /// <returns>True if it succeeded; False if not </returns>
         protected virtual bool TryClose()
@@ -99,12 +99,12 @@ namespace Capstone_Chronicles.GUI
     internal class Menu : InteractiveGUI
     {
         ColorSet? highlightColors = null;
-        Button[] options;
+        List<Button> options;
         int selectedIndex = 0;
         private bool wrapAround = false;
 
 
-        public Menu(Label? inPrompt, Button[] inOptions, bool wrap = false,
+        public Menu(Label? inPrompt, List<Button> inOptions, bool wrap = false,
             ColorSet? altForeColors = null, bool inEnabled = true)
             : base(inPrompt, inEnabled)
         {
@@ -117,11 +117,38 @@ namespace Capstone_Chronicles.GUI
             wrapAround = wrap;
         }
 
+        public void Add(Button button, bool refresh)
+        {
+            options.Add(button);
+            if (refresh)
+                ParentScreen.Refresh();
+        }
+        public void Add(params Button[] buttons)
+        {
+            if (buttons.Length == 1)
+                options.Add(buttons[0]);
+            else
+                options.AddRange(buttons);
+            ParentScreen.Refresh();
+        }
+        public void ClearOptions(bool refresh = true)
+        {
+            options.Clear();
+            if (refresh)
+                ParentScreen.Refresh();
+        }
+
         public override void Display()
         {
             Prompt?.Display();
 
-            for (int i = 0; i < options.Length; i++)
+            //ensure button index is in bounds
+            if (selectedIndex >= options.Count)
+                selectedIndex = options.Count - 1;
+            else if (selectedIndex < 0)
+                selectedIndex = 0;
+
+            for (int i = 0; i < options.Count; i++)
             {
                 if (selectedIndex == i)
                 {
@@ -146,10 +173,11 @@ namespace Capstone_Chronicles.GUI
             while (GameManager.ActiveInteractiveElement == this)
             {
                 var inputKey = ReadKey(true);
+
                 if (inputKey.Key == ConsoleKey.DownArrow)
                 {
                     //Keep button index in bounds
-                    if (selectedIndex >= options.Length - 1)
+                    if (selectedIndex >= options.Count - 1)
                     {
                         if (wrapAround)
                             selectedIndex = 0;
@@ -165,7 +193,7 @@ namespace Capstone_Chronicles.GUI
                     if (selectedIndex <= 0)
                     {
                         if (wrapAround)
-                            selectedIndex = options.Length - 1;
+                            selectedIndex = options.Count - 1;
                         else
                             continue;//No reason to refresh
                     }
@@ -174,7 +202,10 @@ namespace Capstone_Chronicles.GUI
                 }
                 else if (inputKey.Key == ConsoleKey.Enter)
                 {
-                    options[selectedIndex].Press(this);
+                    if (selectedIndex >= 0 && selectedIndex < options.Count)
+                        options[selectedIndex].Press(this);
+                    else
+                        throw new IndexOutOfRangeException();
 
                     //The button can stop this from happening if needed
                     TryClose();

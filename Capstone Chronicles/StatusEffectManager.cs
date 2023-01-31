@@ -18,7 +18,8 @@ namespace Capstone_Chronicles
 
             var baseDamage = (target.MaxHp / 10f);
             target.ModifyHealth(-(int)(baseDamage + RNG.RandomInt(-(int)(baseDamage / 5).Clamp(2, 10),
-                (int)(baseDamage / 5).Clamp(2, 10))).Clamp(1, float.MaxValue), atkElmt: ElementManager.OMNI);
+                (int)(baseDamage / 5).Clamp(2, 10))).Clamp(1, float.MaxValue), atkElmt: ElementManager.OMNI, 
+                ignoreGuard: true);
 
         }, "{0} got poisoned", "{0} recovered from the poison");
 
@@ -30,7 +31,8 @@ namespace Capstone_Chronicles
 
             var baseDamage = (target.MaxHp / 3f).Clamp(1, 40);
             target.ModifyHealth(-(int)(baseDamage + RNG.RandomInt(-(int)(baseDamage / 5).Clamp(2, 10),
-                (int)(baseDamage / 5).Clamp(2, 10))), atkElmt: ElementManager.FIRE);
+                (int)(baseDamage / 5).Clamp(2, 10))), atkElmt: ElementManager.FIRE,
+                ignoreGuard: true);
 
         }, "{0} got set on fire", "{0} is no longer on fire");
 
@@ -105,7 +107,7 @@ namespace Capstone_Chronicles
         public string Name;
 
         Action<Actor> turnAction;
-        Action<Actor> recoverAction;
+        Action<Actor>? recoverAction;
         int minPossibleTurns = 1;
         int maxPossibleTurns = 8;
 
@@ -115,7 +117,7 @@ namespace Capstone_Chronicles
         string inflictText = "{0} isn't feeling well";
         string removeText = "{0} went back to normal";
 
-        public StatusEffect(string n, int minPT, int maxPT, Action<Actor> tAction, string iText = "{0} isn't feeling well", string rtext = "{0} went back to normal", Action<Actor> recAction = null)
+        public StatusEffect(string n, int minPT, int maxPT, Action<Actor> tAction, string iText = "{0} isn't feeling well", string rtext = "{0} went back to normal", Action<Actor>? recAction = null)
         {
             Name = n;
             turnAction = tAction;
@@ -146,6 +148,9 @@ namespace Capstone_Chronicles
 
         public bool TryInflict(Actor target, int duration = -1, bool showInflictText = true, bool performImmediately = false)
         {
+            if (target.Hp <= 0)
+                return false;
+
             Thread.Sleep(TimeSpan.FromSeconds(0.01));//For randomizing
             target.statusEffects.RemoveAll((m) => m == null);
             //print(target.Name + " has " + target.statusEffects.Count + " status effects. Can add more: " + (target.statusEffects.Count < Actor.statusEffectCapacity));
@@ -184,6 +189,9 @@ namespace Capstone_Chronicles
 
         public void PerformAction(Actor target)
         {
+            if (target.Hp <= 0)
+                return;
+
             turnAction.Invoke(target);
 
             turnsActive++;
@@ -191,6 +199,9 @@ namespace Capstone_Chronicles
         }
         public void TryRemoveEffect(Actor target, bool forceRemove = false, bool activateRecoverAction = true)
         {
+            if (target.Hp <= 0)
+                return;
+
             if (turnsActive >= turnLimit || forceRemove)
             {
                 target.statusEffects[target.statusEffects.IndexOf(this)] = null;

@@ -17,7 +17,7 @@ namespace Capstone_Chronicles
 
         public static State gameState;
         public static Scene? CurrentScene { get; private set; }
-        /// <summary> The GUI element currently recieving input </summary>
+        /// <summary> The GUI element currently receiving input </summary>
         public static InteractiveGUI? ActiveInteractiveElement { get; set; }
 
         public static void ChangeScene(Scene scene)

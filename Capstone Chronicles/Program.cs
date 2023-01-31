@@ -45,8 +45,8 @@ namespace Capstone_Chronicles
 
         static void Main(string[] args)
         {
-            GameManager.ChangeScene(GameManager.SceneFactory.TitleScreen);
-
+            //GameManager.ChangeScene(GameManager.SceneFactory.TitleScreen);
+            GameManager.ChangeScene(GameManager.SceneFactory.GetBattleScene());
             //This means the game stopped without properly exiting
             if (GameIsRunning)
             {
@@ -64,7 +64,11 @@ namespace Capstone_Chronicles
         public static void print<T>(T message, bool singleLine = false)
         {
 #if DEBUG
-            Write("DEBUG: " + message + (singleLine ? null : '\n'));
+            if (GetCursorPosition().Left == 0)
+                Write("DEBUG: ");
+            Write(message.ToString() + (singleLine ? null : '\n'));
+            //Thread.Sleep(TimeSpan.FromSeconds(2));
+            ReadKey(true);
 #endif
         }
     }
@@ -77,8 +81,8 @@ namespace Capstone_Chronicles
         public static bool OneInTwo { get => Chance(0.5f); }
         public static bool OneInFour { get => Chance(0.25f); }
         public static bool ThreeInFour { get => Chance(0.75f); }
-        public static bool OneInThree { get => Chance(1 / 3); }
-        public static bool TwoInThree { get => Chance(2 / 3); }
+        public static bool OneInThree { get => Chance(1f / 3f); }
+        public static bool TwoInThree { get => Chance(2f / 3f); }
 
         /*x// <summary>
         /// Runs a check based on percent chance out of 100
@@ -115,7 +119,7 @@ namespace Capstone_Chronicles
         /// </summary>
         public static int RandomInt(int inclusiveMin, int inclusiveMax)
         {
-            if (inclusiveMin <= inclusiveMax)
+            if (inclusiveMin >= inclusiveMax)
                 throw new ArgumentOutOfRangeException("Arguments must create a valid range!");
 
             return Rand.Next(inclusiveMin, inclusiveMax + 1);
@@ -165,9 +169,9 @@ namespace Capstone_Chronicles
         /// <param name="min">Inclusive minimum</param>
         /// <param name="max">Inclusive maximum</param>
         /// <returns></returns>
-        public static T Clamp<T>(this T value, T min, T max)
+        public static T Clamp<T>(this T value, T min, T max) where T : struct
         {
-            if (value is not int && value is not float)
+            if (value is not int && value is not float && value is not double)
                 throw new ArgumentException("Generic Type <T> must be a number!");
             
             dynamic v = value;
