@@ -2,21 +2,19 @@
 
 namespace Capstone_Chronicles
 {
-    internal static partial class GameManager
+    public static class SceneFactory
     {
-        public static class SceneFactory
+        public static Scene TitleScreen
         {
-            public static Scene TitleScreen 
-            { 
-                get
+            get
+            {
+                InputField nameField = new InputField("What is your name?", input =>
                 {
-                    InputField nameField = new InputField("What is your name?", input =>
-                    {
-                        HeroManager.Player.Name = input;
-                        ChangeScene(GetBattleScene());
-                    }, false);
+                    HeroManager.Player.Name = input;
+                    GameManager.ChangeScene(SorecordForest);
+                }, false);
 
-                    var options = new List<Button>() {
+                var options = new List<Button>() {
                     new Button("Start", (menu) =>
                     {
                         Console.Beep(100, 60);
@@ -34,21 +32,39 @@ namespace Capstone_Chronicles
                     })
                     };
 
-                    return new Scene(new GUIComponent[] 
-                    {
-                        new Menu("Capstone Chronicles", options, true),
-                        nameField 
-                    });
-                } 
-            }
+                //http://www.patorjk.com/software/taag/#p=display&h=1&v=0&f=Calvin%20S&t=%20Capstone%20%20%20%0A%20%20Chronicles
+                var title = @"
+  ╔═╗┌─┐┌─┐┌─┐┌┬┐┌─┐┌┐┌┌─┐      
+  ║  ├─┤├─┘└─┐ │ │ ││││├┤       
+  ╚═╝┴ ┴┴  └─┘ ┴ └─┘┘└┘└─┘      
+    ╔═╗┬ ┬┬─┐┌─┐┌┐┌┬┌─┐┬  ┌─┐┌─┐
+    ║  ├─┤├┬┘│ ││││││  │  ├┤ └─┐
+    ╚═╝┴ ┴┴└─└─┘┘└┘┴└─┘┴─┘└─┘└─┘
+";
 
-            public static BattleScene GetBattleScene()
-            {
-
-                //The components are filled out by the BattleScene itself
-                //Switching to this scene will automatically trigger a battle
-                return new BattleScene(EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test);
+                return new Scene(new GUIComponent[]
+                {
+                    new Menu(title, options, true),
+                    nameField
+                });
             }
         }
+
+        public static OverworldScene SorecordForest
+        {
+            get
+            {
+                return new OverworldScene(null, null, Array.Empty<GUIComponent>());
+            }
+        }
+
+        public static BattleScene GetBattleScene()
+        {
+
+            //The components are filled out by the BattleScene itself
+            //Switching to this scene will automatically trigger a battle
+            return new BattleScene(EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test);
+        }
     }
+
 }

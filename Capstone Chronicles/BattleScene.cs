@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static Capstone_Chronicles.Program;
 using Capstone_Chronicles.GUI;
 
 namespace Capstone_Chronicles
 {
-    internal class BattleScene : Scene
+    public class BattleScene : Scene
     {
+        public enum RoundResult
+        {
+            IN_COMBAT, WIN, LOSE, FLED
+        }
+
         static int totalExp = 0;
 
-        static Hero curHero = HeroManager.Party[0];
+        static Hero? curHero = HeroManager.Party[0];
         static List<Enemy> enemies = new();
         static bool openSkillMenu = false;
 
-        //GUI
-        static Menu actionMenu = new Menu(
+        #region GUI References
+        static readonly Menu ActionMenuTemplate = new Menu(
             new Label(dynamicText: () =>
                 {
-                    actionMenu.Prompt.Text = "What will {0} do?\nHP: {1}/{2} | SP: {3}/{4}";
-                    actionMenu.Prompt.SetText(actionMenu.Prompt.Text, 
+                    var format = "What will {0} do?\nHP: {1}/{2} | SP: {3}/{4}";
+                    actionMenu.Prompt.SetDynamicText(format, 
                         curHero.Name, curHero.Hp, curHero.MaxHp, curHero.Sp, curHero.MaxSp);
                 }),
             new()
@@ -46,20 +46,45 @@ namespace Capstone_Chronicles
                 {
                     curHero.nextAction = SkillManager.Guard;
                 }),
-            });
+                new Button("Flee", menu =>
+                {
+                    actionMenu.SetActive(false);
 
-        static Menu skillMenu = new Menu("Select a skill",
+                    Current.ToggleInfoLabels(true);
+
+                    print("You attempted to run", delayAfter: .25f);
+                    print(".", true, delayAfter: .25f);
+                    print(".", true, delayAfter: .25f);
+                    print(".", true, delayAfter: .75f);
+
+                    if (RNG.OneInThree)
+                    {
+                        print(" But your path was blocked");
+                        curHero.nextAction = SkillManager.Skip_Turn;
+                    }
+                    else
+                    {
+                        print(" And succeeded!");
+                        curHero = null;
+                    }
+
+                    GameManager.CurrentScene.ToggleInfoLabels(false);
+                }),
+            });
+        static Menu actionMenu = ActionMenuTemplate.ShallowCopy();
+
+        
+        static Menu skillMenu = SkillMenuTemplate.ShallowCopy();
+
+        static readonly Menu TargetMenuTemplate = new Menu("Select a target",
             new()
             {
 
-            });
+            }, wrap: true, remember: true, inRowLimit: 3);
+        static Menu targetMenu = TargetMenuTemplate.ShallowCopy();
 
-        static Menu targetMenu = new Menu("Select a target",
-            new()
-            {
+        #endregion
 
-            });
-        //
 
         public BattleScene(params Enemy[] inEnemies) 
             : base(Array.Empty<GUIComponent>())
@@ -89,25 +114,49 @@ namespace Capstone_Chronicles
             AddGUIElement(actionMenu, false);
             AddGUIElement(targetMenu, false);
             AddGUIElement(skillMenu, false);
+            AddGUIElement(skillInfoLabel, false);
         }
 
         public override void Start()
         {
             base.Start();
             RunBattle();
+            GameManager.ChangeScene(Previous);
         }
 
-        private void RunBattle()
+
+        private static void RunBattle()
         {
-            while (RunRound());
+            RoundResult result;
+            while (RunRound(out result));
+
+            //! END OF BATTLE
+            if (result == RoundResult.LOSE)
+            {
+                GameManager.GameOver();
+                return;
+            }
+            else if (result == RoundResult.FLED)
+                return;
+
+            foreach (var hero in HeroManager.Party)
+            {
+                if (hero.Hp == 0)
+                    continue;
+
+                hero.Exp += totalExp;
+                hero.TryLevelUp();
+            }
         }
 
         /// <summary>
         /// Runs battle logic for one round
         /// </summary>
         /// <returns> True if the battle is still going; False if the battle is over </returns>
-        private bool RunRound()
+        private static bool RunRound(out RoundResult roundResult)
         {
+            roundResult = RoundResult.IN_COMBAT;
+            Current.ToggleInfoLabels(false);
             var heroes = new List<Hero>();
 
             //! HEROES DECIDE
@@ -119,8 +168,22 @@ namespace Capstone_Chronicles
                 else
                     continue;
 
+                actionMenu.SetOptions(ActionMenuTemplate);
+
                 curHero = HeroManager.Party[i];
+
+                if (curHero != heroes[0])
+                    actionMenu.Remove("Flee", false);
+                if (curHero.skills.Count == 0)
+                    actionMenu.Remove("Skills", false);
+
                 actionMenu.SetActive(true);
+
+                if (curHero == null)//Player successfully fled
+                {
+                    roundResult = RoundResult.FLED;
+                    return false;
+                }
 
                 if (openSkillMenu)
                 {
@@ -134,29 +197,35 @@ namespace Capstone_Chronicles
                             curHero.nextAction = skill;
                         }), false);
                     }
+
+                    Console.SetCursorPosition(0, skillMenu.GetBottomCursorPosistion());
+                    TryUpdateSkillDescription(skillMenu);//Sets bottom text to the correct value immediately
+                    skillInfoLabel.SetActive(true);
                     skillMenu.SetActive(true);
+
+                    skillInfoLabel.SetActive(false);
                 }
 
-                //! Choose Target
+                //! Hero Choose Target
                 targetMenu.ClearOptions(false);
                 curHero.targets.Clear();
 
-                if (curHero.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_ALLY)
+                if (curHero.nextAction.targetType == SkillBase.TargetGroup.ONE_ALLY)
                 {
                     foreach (var h in HeroManager.Party)
                     {
-                        targetMenu.Add(new Button(h.Name, (menu) =>
+                        targetMenu.Add(new Button($"{h.Name} | HP: {h.Hp}/{h.MaxHp}", (menu) =>
                         {
                             curHero.targets.Add(h);
                         }), false);
                     }
                     targetMenu.SetActive(true);
                 }
-                else if (curHero.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT)
+                else if (curHero.nextAction.targetType == SkillBase.TargetGroup.ONE_OPPONENT)
                 {
                     foreach (var e in enemies)
                     {
-                        targetMenu.Add(new Button(e.Name, (menu) =>
+                        targetMenu.Add(new Button($"{e.Name} | HP: {e.Hp}/{e.MaxHp}", (menu) =>
                         {
                             curHero.targets.Add(e);
                         }), false);
@@ -165,12 +234,11 @@ namespace Capstone_Chronicles
                 }
             }
 
-            //TODO ENEMIES DECIDE
+            //! ENEMIES DECIDE
             foreach (var enemy in enemies)
             {
-                enemy.targets.Clear();
-                enemy.nextAction = SkillManager.Poison_Powder;
-                enemy.targets.Add(heroes[0]);
+                enemy.nextAction = enemy.decideTurnAction.Invoke();
+                enemy.ChooseTarget(heroes.ToList<Actor>(), enemy.nextAction.targetType);
             }
 
             //! DECIDE TURN ORDER
@@ -180,15 +248,7 @@ namespace Capstone_Chronicles
             allActors = allActors.OrderByDescending(x => x.nextAction?.Priority).ThenByDescending(x => x.Speed).ToList();
 
             //! PLAY TURN
-            void _RunStatusEffectLogic(in Actor curActor)
-            {
-                for (int i = 0; i < curActor.statusEffects.Count; i++)
-                {
-                    curActor.statusEffects[i]?.PerformAction(curActor);
-                    curActor.statusEffects[i]?.TryRemoveEffect(curActor);
-                }
-            }
-
+            Current.ToggleInfoLabels(true);
             foreach (var curActor in allActors)
             {
                 if (curActor.Hp <= 0)
@@ -197,21 +257,58 @@ namespace Capstone_Chronicles
                 List<Actor> targets = curActor.targets;
                 var activeEnemies = new List<Enemy>(enemies);
 
+                // This uses an out parameter for clarity
+                void _EndOfTurnLogic(in Actor curActor, out bool endBattle)
+                {
+                    activeEnemies.RemoveAll(x => x.Hp == 0);
+                    heroes.RemoveAll(x => x.Hp == 0);
+                    if (activeEnemies.Count != 0 && heroes.Count != 0)//Continue battle
+                    {
+                        for (int i = 0; i < curActor.statusEffects.Count; i++)
+                        {
+                            curActor.statusEffects[i]?.PerformAction(curActor);
+                            if (curActor.Hp == 0)
+                            {
+                                if (curActor is Hero)
+                                    heroes.Remove((Hero)curActor);
+                                if (curActor is Enemy)
+                                    activeEnemies.Remove((Enemy)curActor);
+
+                                if (activeEnemies.Count != 0 && heroes.Count != 0)
+                                {
+                                    endBattle = false;
+                                    return;
+                                }
+                                endBattle = true;
+                                return;
+                            }
+                            curActor.statusEffects[i]?.TryRemoveEffect(curActor);
+                        }
+                        endBattle = false;
+                    }
+                    else //no actors left
+                        endBattle = true;
+                }
+
+                //Auto Skip if null
                 if (curActor.nextAction == null)
                 {
                     SkillManager.Skip_Turn.Use(curActor);
-                    _RunStatusEffectLogic(curActor);
+                    _EndOfTurnLogic(curActor, out bool stop);
+
+                    if (stop)
+                        break;
                     continue;
                 }
 
                 //Self or no target
-                if (curActor.nextAction.targetType == SkillBase.TargetGroup.NO_TARGET)
+                if (curActor.nextAction.targetType == SkillBase.TargetGroup.SELF)
                 {
                     (curActor.nextAction as Skill<Actor>).Use(curActor);
                 }
                 //Single Target
-                else if (targets.Count != 0 && (curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT ||
-                    curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_ALLY))
+                else if (targets.Count != 0 && (curActor.nextAction.targetType == SkillBase.TargetGroup.ONE_OPPONENT ||
+                    curActor.nextAction.targetType == SkillBase.TargetGroup.ONE_ALLY))
                 {
                     //Re-target if target was already gone
                     if (targets[0].Hp <= 0 && curActor.nextAction.actionType != SkillBase.ActionType.REVIVAL)
@@ -236,7 +333,7 @@ namespace Capstone_Chronicles
                         {
                             targets[0] = curActor;
                         }
-                        else if (targets[0] is Hero)//target the first hero over
+                        else if (targets[0] is Hero)//target the first hero
                         {
                             heroes.RemoveAll(x => x.Hp == 0);
                             print(targets[0].Name + " isn't there. ", true);
@@ -271,7 +368,7 @@ namespace Capstone_Chronicles
                 else
                 {
                     //Everyone
-                    if (curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_EVERYONE)
+                    if (curActor.nextAction.targetType == SkillBase.TargetGroup.EVERYONE)
                     {
                         //Don't remove from allActors within this loop
                         List<Actor> everyone = new(allActors);
@@ -280,7 +377,7 @@ namespace Capstone_Chronicles
                         (curActor.nextAction as Skill<Actor, List<Actor>>).Use(curActor, everyone);
                     }
                     //Anyone
-                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_ANYONE)
+                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.ANYONE)
                     {
                         List<Actor> everyone = new(allActors);
                         everyone.RemoveAll((a) => a.Hp <= 0);
@@ -289,7 +386,7 @@ namespace Capstone_Chronicles
                         (curActor.nextAction as Skill<Actor, Actor>).Use(curActor, curActor.targets[0]);
                     }
                     //All Opponents
-                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_ALL_OPPONENTS)
+                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.ALL_OPPONENTS)
                     {
                         List<Actor> newTargets;
                         if (curActor is Enemy)
@@ -303,7 +400,7 @@ namespace Capstone_Chronicles
                         (curActor.nextAction as Skill<Actor, List<Actor>>).Use(curActor, targets);
                     }
                     //All Allies
-                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.TARGET_ALL_ALLIES)
+                    else if (curActor.nextAction.targetType == SkillBase.TargetGroup.ALL_ALLIES)
                     {
                         List<Actor> newTargets;
                         if (curActor is Enemy)
@@ -323,11 +420,11 @@ namespace Capstone_Chronicles
                     }
                 }
 
-                //Don't run the status effect if the battle will end
-                activeEnemies.RemoveAll(x => x.Hp == 0);
-                heroes.RemoveAll(x => x.Hp == 0);
-                if (activeEnemies.Count != 0)
-                    _RunStatusEffectLogic(curActor);
+                _EndOfTurnLogic(curActor, out bool endBattle);
+
+                if (endBattle)
+                    break;
+                continue;
             }
 
             //! EXP
@@ -342,9 +439,15 @@ namespace Capstone_Chronicles
             heroes.RemoveAll(x => x.Hp <= 0);
             //curHero = HeroManager.Party[1];
 
-            if (enemies.Count == 0 || heroes.Count == 0)
+            if (enemies.Count == 0)
+                roundResult = RoundResult.WIN;
+            else if (heroes.Count == 0)
+                roundResult = RoundResult.LOSE;
+
+            if (roundResult != RoundResult.IN_COMBAT)
                 return false;
             return true;
         }
+
     }
 }

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static Capstone_Chronicles.Program;
-using System.Xml.Linq;
-using static Capstone_Chronicles.Element;
+//TODO remove this
+//using static Capstone_Chronicles.Program;/*
+using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
@@ -15,7 +12,8 @@ namespace Capstone_Chronicles
     /// </summary>
     public partial class Actor
     {
-        //Contains nested struct StatsStruct
+        //Contains nested struct*/ StatsStruct
+        //Contains nested class*/ StatGrowth
 
         /*? Why are the stats here:
          * I originally used a Stats struct for this, but that meant either making every setter 
@@ -23,12 +21,11 @@ namespace Capstone_Chronicles
          * Only Actors need access to setting stats anyway, so I just moved the stats here.
          */
         #region Basic Stats
-        public Element Element { get; set; }
-        public int Level { get; protected set; }
+        public int Level { get; protected set; } = 1;
         public int MaxHp { get; protected set; }
 
         private int _hp;
-        public int Hp { get => _hp; set => _hp = value.Clamp(0, MaxHp); }
+        public int Hp { get => _hp; protected set => _hp = value.Clamp(0, MaxHp); }
 
         public int MaxSp { get; protected set; }
 
@@ -40,17 +37,21 @@ namespace Capstone_Chronicles
         public int SpAttack { get; protected set; }
         public int SpDefense { get; protected set; }
         public int Speed { get; protected set; }
-        public int Exp { get; protected set; }
+        public int Exp { get; set; }
         #endregion
         //*/
 
         public string Name { get; set; } = "";
+        public Element Element { get; set; }
         public bool isGuarding;
 
         public SkillBase? nextAction;
         public List<Actor> targets = new List<Actor>();
 
+        /// <summary>All current skills</summary>
         public List<SkillBase> skills = new List<SkillBase>();
+        /// <summary>Skills that can be learned by leveling up</summary>
+        protected Dictionary<int, SkillBase> levelUpSkillDictionary;
 
         public List<StatusEffect?> statusEffects = new();
 
@@ -58,10 +59,11 @@ namespace Capstone_Chronicles
         public const int MAX_LEVEL = 100;
         public const float EFFECT_CAPACITY = 3;
 
-        public Actor(string inName, Element inElement, StatsStruct inStats)
+        public Actor(string inName, Element inElement, StatsStruct inStats, Dictionary<int, SkillBase> inSkillDict)
         {
             Name = inName;
             Element = inElement;
+            levelUpSkillDictionary = inSkillDict;
 
             Level = inStats.Level;
             MaxHp = inStats.MaxHp;
@@ -121,7 +123,8 @@ namespace Capstone_Chronicles
                 else
                     print("It had no visible effect on " + Name);
             }
-            else//Damage logic
+            //! Damage Logic
+            else
             {
                 var mult = ElementManager.CalculateAttackMultiplier(atkElmt, this);
                 //Deal at least 1 damage unless the multiplier is specifically 0
@@ -167,6 +170,7 @@ namespace Capstone_Chronicles
             if (shouldAffectHp)
                 Hp = (Hp + amount).Clamp(0, MaxHp);
 
+            //Defeat
             if (Hp <= 0)
             {
                 if (this is Hero)
@@ -183,8 +187,7 @@ namespace Capstone_Chronicles
 
         public virtual void ModifyConra(int value, Element? attackElement = null)
         {
-            if (attackElement == null)
-                attackElement = ElementManager.NORMAL;
+            attackElement ??= ElementManager.OMNI;
 
             if (value > 0)
             {
@@ -215,26 +218,133 @@ namespace Capstone_Chronicles
     /// <summary>
     /// An actor that fights on the player's team
     /// </summary>
-    public partial class Hero : Actor
+    public class Hero : Actor
     {
-        //Contains nested class StatGrowth
+        int neededExp = 4;
+        public StatGrowth GrowthInfo { get; private set; }
+        public static event Action<StatGrowth, Actor>? AfterInit;
 
-        public Hero(string inName, StatsStruct inStats, StatGrowth growthInfo, Element? inElement = null) 
-            : base(inName, inElement == null ? ElementManager.NORMAL : inElement, inStats)
+        public Hero(string inName, StatsStruct inStats, StatGrowth inGrowthInfo, 
+            Dictionary<int, SkillBase> inSkillDict, Element? inElement = null) 
+            : base(inName, inElement ?? ElementManager.NORMAL, inStats, inSkillDict)
         {
-            
             //TODO implement StatGrowth
+            GrowthInfo = inGrowthInfo;
 
+            //Learn any skills lower than or equal to current level
+            for (int i = 0; i <= Level; i++)
+            {
+                levelUpSkillDictionary.TryGetValue(i, out SkillBase? newSkill);
+                if (newSkill != null)
+                    LearnSkill(newSkill, false);
+            }
+
+            AfterInit?.Invoke(GrowthInfo, this);
         }
-    }
+
+        private void SortSkills()
+        {
+            skills = skills.OrderBy(x => x.actionType).ThenBy(x => x.element.NameFromEnum).
+                ThenBy(x => x.targetType).ThenBy(x => x.Cost).ToList();
+        }
+
+        public void LearnSkill(SkillBase newSkill, bool display = true)
+        {
+            if (!skills.Contains(newSkill)) //Heroes shouldn't have duplicate skills, but enemies can
+            {
+                skills.Add(newSkill);
+                if (display)
+                    print($"{Name} learned {newSkill.Name}!");
+            }
+
+            SortSkills();
+        }
+
+        /// <summary>
+        /// The hero will attempt to level up as many times as they can
+        /// </summary>
+        public void TryLevelUp()
+        {
+            while (Exp >= neededExp)
+            {
+                Level++;
+                Exp -= neededExp;
+
+                //TODO Stat Growth (including neededExp)
+
+                GrowthInfo.AttackGain();
+
+                //
+
+                //! Skills
+                levelUpSkillDictionary.TryGetValue(Level, out SkillBase? newSkill);
+                if (newSkill != null)
+                    LearnSkill(newSkill);
+            }
+        }
+
+    }//End of Hero
 
     /// <summary>
     /// An actor that fights against the player
     /// </summary>
     public class Enemy : Actor
     {
-        public Enemy(string inName, Element inElement, StatsStruct inStats) : base(inName, inElement, inStats)
+        /// <summary>
+        /// Modify this to give the enemy custom behavior
+        /// </summary>
+        public Func<SkillBase> decideTurnAction;
+
+        public Enemy(string inName, Element inElement, StatsStruct inStats, Func<SkillBase>? ai = null)
+            : base(inName, inElement, inStats, null/*TODO fix*/)
         {
+            //TODO add skills based on current level and the skill dictionary
+
+            //Normal attack should come last
+            skills.Add(SkillManager.Attack);
+
+            if (ai != null)
+                decideTurnAction = ai;
+            else
+                decideTurnAction = () => { return DecideTurnAction(); };
         }
+
+        SkillBase DecideTurnAction()
+        {
+            var skillPool = skills.ToList();//copy of the original
+            foreach (var skill in skills)
+            {
+                if (skill.Cost > Sp && RNG.OneInTwo)//Leaves a small chance to use a skill that costs too much
+                    skillPool.Remove(skill);
+            }
+
+            var randInt = RNG.RandomInt(0, skillPool.Count);
+            if (randInt == skillPool.Count)//Basic Attack is last so this leaves an increased chance for that
+                randInt = skillPool.Count - 1;
+
+            return skillPool[randInt];
+        }
+        public void ChooseTarget(List<Actor> actorPool, 
+            SkillBase.TargetGroup targetType = SkillBase.TargetGroup.ONE_OPPONENT)
+        {
+            targets.Clear();
+            for (int i = 0; i < actorPool.Count; i++)//Remove defeated actors from potential targets list
+            {
+                if (actorPool[i].Hp <= 0 
+                    || (targetType == SkillBase.TargetGroup.ONE_OPPONENT && actorPool[i] is Enemy)
+                    || (targetType == SkillBase.TargetGroup.ONE_ALLY && actorPool[i] is Hero))
+                    actorPool.RemoveAt(i);
+
+            }
+
+            if (targetType == SkillBase.TargetGroup.ONE_OPPONENT 
+                || targetType == SkillBase.TargetGroup.ONE_ALLY)
+            {
+                targets.Add(actorPool[RNG.RandomInt(0, actorPool.Count - 1)]);
+            }
+            else if (targetType != SkillBase.TargetGroup.SELF)
+                targets = actorPool;
+        }
+
     }
 }

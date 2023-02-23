@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles.GUI
 {
-    internal class Button : Label
+    public class Button : Label
     {
         public ColorSet selectColors;
-        string prefix;
-        readonly Action<Menu> OnPress;
+        string selectedPrefix;
+        string normalPrefix;
+        readonly Action<Menu>? OnPress;
 
-        public Button(string inText, Action<Menu> inBehavior, string inPrefix = ">>", ColorSet inColorSet = default, ColorSet? inAltColorSet = null) : base(inText, inColorSet)
+        public Button(string inText, Action<Menu>? inBehavior, 
+            string inNormPrefix = "  ", string inSelPrefix = " > ", 
+            ColorSet inColorSet = default, ColorSet? inAltColorSet = null) : base(inText, inColorSet)
         {
             if (inColorSet.Equals(default(ColorSet)))
                 inColorSet = ColorSet.Normal;
@@ -21,8 +24,10 @@ namespace Capstone_Chronicles.GUI
             if (inAltColorSet == null)
                 inAltColorSet = ColorSet.Inverse;
 
-            prefix = inPrefix;
+            normalPrefix = inNormPrefix;
+            selectedPrefix = inSelPrefix;
             OnPress = inBehavior;
+            colors = inColorSet;
             selectColors = inAltColorSet.Value;
         }
 
@@ -36,19 +41,28 @@ namespace Capstone_Chronicles.GUI
             {
                 if (args[0] == true)
                 {
-                    Write(prefix);
+                    Write(selectedPrefix);
                     base.Display(selectColors.foreground, selectColors.background);
                 }
                 else
-                    base.Display();
+                {
+                    Write(normalPrefix);
+                    base.Display((colors ?? ColorSet.Normal).foreground, (colors ?? ColorSet.Normal).background);
+                }
             }
             else
                 throw new ArgumentException("This function takes a bool value");
         }
 
-        internal void Press(Menu menu)
+        public bool Press(Menu menu)
         {
-            OnPress.Invoke(menu);
+            if (OnPress != null)
+            {
+                OnPress.Invoke(menu);
+                return true;
+            }
+
+            return false;
         }
 
     }

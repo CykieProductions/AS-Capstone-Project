@@ -5,7 +5,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 //TODO remove this
-using static Capstone_Chronicles.Program;
+//using static Capstone_Chronicles.Program;/*
+using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
@@ -215,7 +216,7 @@ namespace Capstone_Chronicles
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.ReadKey(true);
             }
-            , 0, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.OMNI);
+            , 0, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.OMNI);
 
             Guard = new Skill<Actor>("Guard", (user) =>
             {
@@ -285,7 +286,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 0, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
+            , 0, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
             Poison_Allies_Test = new Skill<Actor, List<Actor>>("Poison Allies", (user, targets) =>
             {
                 var curSkill = Poison_Allies_Test;
@@ -311,7 +312,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 0, SkillBase.TargetGroup.TARGET_ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
+            , 0, SkillBase.TargetGroup.ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
             Ignite_Allies_Test = new Skill<Actor, List<Actor>>("Ignite Allies", (user, targets) =>
             {
                 var curSkill = Ignite_Allies_Test;
@@ -337,7 +338,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 0, SkillBase.TargetGroup.TARGET_ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
+            , 0, SkillBase.TargetGroup.ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
             Restore_SP_Allies_Test = new Skill<Actor, List<Actor>>("Restore SP of Allies", (user, targets) =>
             {
                 var curSkill = Restore_SP_Allies_Test;
@@ -355,7 +356,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 0, SkillBase.TargetGroup.TARGET_ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
+            , 0, SkillBase.TargetGroup.ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
             #endregion
 
             #region STATUS EFFECT GIVING
@@ -381,7 +382,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 5, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
+            , 5, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
 
             Poison_Cloud = new Skill<Actor, List<Actor>>("Poison Cloud", (user, targets) =>
             {
@@ -408,7 +409,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 14, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
+            , 14, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
             #endregion
 
             #region ATTACKS
@@ -418,7 +419,7 @@ namespace Capstone_Chronicles
                 //user.Attack(target);
                 target.ModifyHealth(-BasicAttackFormula(user, 1), Attack);
             }
-            , 0, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT);
+            , 0, SkillBase.TargetGroup.ONE_OPPONENT);
 
             #region FIRE
             Fireball = new Skill<Actor, Actor>("Fireball", (user, target) =>
@@ -440,7 +441,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 4, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.FIRE);
+            , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
             Flame_Burst = new Skill<Actor, Actor>("Flame Burst", (user, target) =>
             {
@@ -461,7 +462,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.FIRE);
+            , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
             Eruption = new Skill<Actor, Actor>("Eruption", (user, target) =>
             {
@@ -482,7 +483,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 24, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.FIRE);
+            , 24, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
             Flare_Fall = new Skill<Actor, List<Actor>>("Flare Fall", (user, targets) =>
             {
@@ -507,7 +508,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.FIRE);
+            , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.FIRE);
 
             Blazing_Vortex = new Skill<Actor, List<Actor>>("Blazing Vortex", (user, targets) =>
             {
@@ -531,7 +532,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 16, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.FIRE);
+            , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.FIRE);
 
             Supernova = new Skill<Actor, List<Actor>>("Supernova", (user, targets) =>
             {
@@ -555,7 +556,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 50, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.FIRE);
+            , 50, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.FIRE);
             #endregion
 
             #region WATER
@@ -572,7 +573,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 4, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.WATER);
+            , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
             Water_Jet = new Skill<Actor, Actor>("Water Jet", (user, target) =>
             {
@@ -588,7 +589,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.WATER);
+            , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
             Hydo_Cannon = new Skill<Actor, Actor>("Hydro Cannon", (user, target) =>
             {
@@ -610,7 +611,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 28, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.WATER);
+            , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
             Waterfall = new Skill<Actor, List<Actor>>("Waterfall", (user, targets) =>
             {
@@ -630,7 +631,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 9, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.WATER);
+            , 9, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.WATER);
 
             Deluge = new Skill<Actor, List<Actor>>("Deluge", (user, targets) =>
             {
@@ -650,7 +651,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 16, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.WATER);
+            , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.WATER);
 
             Tsunami = new Skill<Actor, List<Actor>>("Tsunami", (user, targets) =>
             {
@@ -674,7 +675,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 45, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.WATER);
+            , 45, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.WATER);
             #endregion
 
             #region PLANT
@@ -691,7 +692,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 3, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.PLANT);
+            , 3, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
             Leaf_Cutter = new Skill<Actor, Actor>("Leaf Cutter", (user, target) =>
             {
@@ -708,7 +709,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 9, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.PLANT);
+            , 9, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
             Needle_Tomb = new Skill<Actor, Actor>("Needle Tomb", (user, target) =>
             {
@@ -730,7 +731,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 18, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.PLANT);
+            , 18, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
             Leaf_Storm = new Skill<Actor, List<Actor>>("Leaf Storm", (user, targets) =>
             {
@@ -750,7 +751,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 9, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.PLANT);
+            , 9, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT);
 
             Root_Wave = new Skill<Actor, List<Actor>>("Root Wave", (user, targets) =>
             {
@@ -770,7 +771,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 16, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.PLANT);
+            , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT);
 
             Thorn_Canopy = new Skill<Actor, List<Actor>>("Thorn Canopy", (user, targets) =>
             {
@@ -793,7 +794,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 38, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.PLANT);
+            , 38, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT);
             #endregion
 
             #region GROUND
@@ -829,7 +830,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 4, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.GROUND);
+            , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
             Geo_Shift = new Skill<Actor, Actor>("Geo Shift", (user, target) =>
             {
@@ -846,7 +847,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.GROUND);
+            , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
             Fissure = new Skill<Actor, Actor>("Fissure", (user, target) =>
             {
@@ -863,7 +864,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 24, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.GROUND);
+            , 24, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
             Rock_Slide = new Skill<Actor, List<Actor>>("Rock Slide", (user, targets) =>
             {
@@ -900,7 +901,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.GROUND);
+            , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.GROUND);
 
             Spire_Wall = new Skill<Actor, List<Actor>>("Spire Wall", (user, targets) =>
             {
@@ -921,7 +922,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 16, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.GROUND);
+            , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.GROUND);
 
             Earthquake = new Skill<Actor, List<Actor>>("Earthquake", (user, targets) =>
             {
@@ -942,7 +943,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 50, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.GROUND);
+            , 50, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.GROUND);
             #endregion
 
             #region AIR
@@ -959,7 +960,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 4, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.AIR);
+            , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
             Air_Cannon = new Skill<Actor, Actor>("Air Cannon", (user, target) =>
             {
@@ -975,7 +976,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.AIR);
+            , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
             Sonic_Boom = new Skill<Actor, Actor>("Sonic Boom", (user, target) =>
             {
@@ -994,7 +995,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 28, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.AIR);
+            , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
             Slash_Storm = new Skill<Actor, List<Actor>>("Slash Storm", (user, targets) =>
             {
@@ -1014,7 +1015,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 7, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.AIR);
+            , 7, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.AIR);
 
             Sky_Crusher = new Skill<Actor, List<Actor>>("Sky Crusher", (user, targets) =>
             {
@@ -1034,7 +1035,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 14, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.AIR);
+            , 14, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.AIR);
 
             Hurricane = new Skill<Actor, List<Actor>>("Hurricane", (user, targets) =>
             {
@@ -1055,7 +1056,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 38, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.AIR);
+            , 38, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.AIR);
             #endregion
 
             #region ELECTRIC
@@ -1078,7 +1079,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 4, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.ELECTRIC);
+            , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
             Taser_Grip = new Skill<Actor, Actor>("Taser Grip", (user, target) =>
             {
@@ -1099,7 +1100,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.ELECTRIC);
+            , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
             Ion_Overload = new Skill<Actor, Actor>("Ion Overload", (user, target) =>
             {
@@ -1120,7 +1121,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 28, SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT, ElementManager.ELECTRIC);
+            , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
             Electro_Wave = new Skill<Actor, List<Actor>>("Electro Wave", (user, targets) =>
             {
@@ -1145,7 +1146,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.ELECTRIC);
+            , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.ELECTRIC);
 
             Tesla_Cannon = new Skill<Actor, List<Actor>>("Tesla Cannon", (user, targets) =>
             {
@@ -1169,7 +1170,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 16, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.ELECTRIC);
+            , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.ELECTRIC);
 
             Gigawatt_Dischage = new Skill<Actor, List<Actor>>("Gigawatt_Dischage", (user, targets) =>
             {
@@ -1193,7 +1194,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 50, SkillBase.TargetGroup.TARGET_ALL_OPPONENTS, ElementManager.ELECTRIC);
+            , 50, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.ELECTRIC);
             #endregion
 
             #endregion
@@ -1213,7 +1214,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 3, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.HEALING);
+            , 3, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.HEALING);
 
             Super_Healing_Powder = new Skill<Actor, Actor>("Super Healing Powder", (user, target) =>
             {
@@ -1229,7 +1230,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 8, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.HEALING);
+            , 8, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.HEALING);
 
             //Full heal
             Ultra_Healing_Powder = new Skill<Actor, Actor>("Ultra Healing Powder", (user, target) =>
@@ -1247,7 +1248,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 24, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.HEALING);
+            , 24, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.HEALING);
 
             Healing_Cloud = new Skill<Actor, List<Actor>>("Healing Cloud", (user, targets) =>
             {
@@ -1268,7 +1269,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 18, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
+            , 18, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
 
             Ultra_Healing_Cloud = new Skill<Actor, List<Actor>>("Ultra Healing Cloud", (user, targets) =>
             {
@@ -1289,7 +1290,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 50, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
+            , 50, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
 
 
             Curing_Powder = new Skill<Actor, Actor>("Curing Powder", (user, target) =>
@@ -1315,7 +1316,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 5, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.CURING);
+            , 5, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.CURING);
 
             Curing_Cloud = new Skill<Actor, List<Actor>>("Curing Cloud", (user, targets) =>
             {
@@ -1342,7 +1343,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 22, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.CURING);
+            , 22, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.CURING);
 
 
             Phoenix_Powder = new Skill<Actor, Actor>("Phoenix Powder", (user, target) =>
@@ -1358,7 +1359,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 20, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
+            , 20, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
 
             //Revive to full health 
             Ultra_Phoenix_Powder = new Skill<Actor, Actor>("Ultra Phoenix Powder", (user, target) =>
@@ -1374,7 +1375,7 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 30, SkillBase.TargetGroup.TARGET_SINGLE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
+            , 30, SkillBase.TargetGroup.ONE_ALLY, skillType: SkillBase.ActionType.REVIVAL);
 
             Pheonix_Cloud = new Skill<Actor, List<Actor>>("Phoenix Cloud", (user, targets) =>
             {
@@ -1392,14 +1393,17 @@ namespace Capstone_Chronicles
                 else
                     OutOfSP(user.Name);
             }
-            , 42, SkillBase.TargetGroup.TARGET_ALL_ALLIES, skillType: SkillBase.ActionType.REVIVAL);
+            , 42, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.REVIVAL);
 
             #endregion
 
         }
 
-        public static SkillBase GetSkillByName(string name)
+        public static SkillBase? GetSkillByName(string? name)
         {
+            if (name == null)
+                return null;
+
             callForSkill.Invoke(name);
             var skill = requestedSkill;
 

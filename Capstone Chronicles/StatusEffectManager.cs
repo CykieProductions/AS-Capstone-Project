@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 //TODO remove this
-using static Capstone_Chronicles.Program;
+//using static Capstone_Chronicles.Program;/*
+using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
@@ -68,24 +69,24 @@ namespace Capstone_Chronicles
             if (RNG.OneInThree)//ignore command and do a normal attack on anyone
             {
                 target.nextAction = new Skill<Actor, Actor>(SkillManager.Attack);
-                target.nextAction.targetType = SkillBase.TargetGroup.TARGET_ANYONE;
+                target.nextAction.targetType = SkillBase.TargetGroup.ANYONE;
                 target.targets.Clear();
             }
-            else if (target.nextAction.targetType != SkillBase.TargetGroup.TARGET_EVERYONE && RNG.OneInFour)//use intended move on the wrong target(s)
+            else if (target.nextAction.targetType != SkillBase.TargetGroup.EVERYONE && RNG.OneInFour)//use intended move on the wrong target(s)
             {
-                if (target.targets.Count == 1 && (target.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_OPPONENT
-                    || target.nextAction.targetType == SkillBase.TargetGroup.TARGET_SINGLE_ALLY))//Hit anyone
+                if (target.targets.Count == 1 && (target.nextAction.targetType == SkillBase.TargetGroup.ONE_OPPONENT
+                    || target.nextAction.targetType == SkillBase.TargetGroup.ONE_ALLY))//Hit anyone
                 {
                     target.nextAction = new Skill<Actor, Actor>(target.nextAction as Skill<Actor, Actor>);
-                    target.nextAction.targetType = SkillBase.TargetGroup.TARGET_ANYONE;
+                    target.nextAction.targetType = SkillBase.TargetGroup.ANYONE;
                 }
                 else//Target the opposite group from the intended targets
                 {
                     target.nextAction = new Skill<Actor, List<Actor>>(target.nextAction as Skill<Actor, List<Actor>>);
-                    if (target.nextAction.targetType == SkillBase.TargetGroup.TARGET_ALL_ALLIES)
-                        target.nextAction.targetType = SkillBase.TargetGroup.TARGET_ALL_OPPONENTS;
-                    else if (target.nextAction.targetType == SkillBase.TargetGroup.TARGET_ALL_OPPONENTS)
-                        target.nextAction.targetType = SkillBase.TargetGroup.TARGET_ALL_ALLIES;
+                    if (target.nextAction.targetType == SkillBase.TargetGroup.ALL_ALLIES)
+                        target.nextAction.targetType = SkillBase.TargetGroup.ALL_OPPONENTS;
+                    else if (target.nextAction.targetType == SkillBase.TargetGroup.ALL_OPPONENTS)
+                        target.nextAction.targetType = SkillBase.TargetGroup.ALL_ALLIES;
                 }
                 target.targets.Clear();
             }

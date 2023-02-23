@@ -10,11 +10,40 @@ namespace Capstone_Chronicles
     /// <summary>
     /// Acts as the mediator between the GUI and the Logic
     /// </summary>
-    internal class Scene
+    public class Scene
     {
+        /// <summary>
+        /// Same as GameManager.CurrentScene
+        /// </summary>
+        public static Scene Current { get => GameManager.CurrentScene; }
+        public static Scene Previous { get => GameManager.PreviousScene; }
+
         readonly Action? OnStart = null;
         readonly Action? OnExit = null;
         private List<GUIComponent> elements;
+
+        public Action? OnRenderComplete;
+
+        //! Gameplay 
+        protected static Label skillInfoLabel = new("");
+
+        protected static readonly Menu SkillMenuTemplate = new Menu("Select a skill",
+            new()
+            {
+
+            }, wrap: true, remember: false, inRowLimit: 6, moveAction: TryUpdateSkillDescription, onClose: () =>
+            {
+                skillInfoLabel.SetActive(false, false);
+            });
+
+        //
+
+        //Default way to print stuff to the screen
+        protected Label[] infoLabels = new Label[]
+        {
+            new Label("", null, false),
+            new Label("", null, false),
+        };
 
         /// <summary>
         /// For shared behavior between Scene constructors
@@ -22,6 +51,10 @@ namespace Capstone_Chronicles
         private void _BaseConstructor(GUIComponent[] inElements)
         {
             elements = inElements.ToList();
+            for (int i = 0; i < infoLabels.Length; i++)
+            {
+                AddGUIElement(infoLabels[i], false);
+            }
 
             for (int i = 0; i < elements.Count; i++)
             {
@@ -42,7 +75,8 @@ namespace Capstone_Chronicles
         public void AddGUIElement(GUIComponent newElement, bool enabled)
         {
             newElement.SetParentScreen(this);
-            elements.Add(newElement);
+            if (!elements.Contains(newElement))
+                elements.Add(newElement);
             newElement.SetActive(enabled, false);
         }
 
@@ -53,6 +87,86 @@ namespace Capstone_Chronicles
             {
                 if (elements[i].Enabled)
                     elements[i].Display();
+            }
+
+            OnRenderComplete?.Invoke();
+        }
+
+        protected static void TryUpdateSkillDescription(Menu menu)
+        {
+            if (skillInfoLabel.ParentScreen == null)
+                return;
+
+            var skill = SkillManager.GetSkillByName(menu.GetOptionAt(menu.SelectedIndex)?.Text);
+            if (skill == null)
+            {
+                skillInfoLabel.Text = "-----";
+                return;
+            }
+
+            string targetText = skill.targetType.ToString().Replace('_', ' ');
+
+            skillInfoLabel.Text = $"Skill Info: \nCost: {skill.Cost} | Element: {skill.element.NameFromEnum} " +
+                $"| Type: {skill.actionType} | Targets: {targetText}";
+
+        }
+
+        /// <summary>
+        /// Displays information using the appropriate logic for the current scene type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="singleLine"></param>
+        /// <param name="delayAfter"></param>
+        public static void print<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
+        {
+            GameManager.CurrentScene.Log(message, singleLine, delayAfter);
+        }
+
+        protected virtual void Log<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
+        {
+            infoLabels[1].colors = (Console.ForegroundColor, Console.BackgroundColor);
+            infoLabels[1].Text += message?.ToString() + (singleLine ? "" : '\n');
+
+            if (infoLabels[0].Enabled || infoLabels[1].Enabled)
+                GameManager.CurrentScene.Refresh();
+
+            if (!singleLine)
+            {
+                infoLabels[0].colors = infoLabels[1].colors;
+                infoLabels[0].Text = infoLabels[1].Text;
+                infoLabels[1].Text = "";
+            }
+
+            //Allow player to skip the delay between lines
+            int iterations = 5;
+            for (int i = 0; i < iterations; i++)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(delayAfter / iterations));
+                if (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                    break;
+                }
+            }
+        }
+
+        public void ToggleInfoLabels(bool enabled)
+        {
+            if (enabled == true)
+            {
+                for (int i = 0; i < infoLabels.Length; i++)
+                {
+                    infoLabels[i].SetActive(true);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < infoLabels.Length; i++)
+                {
+                    infoLabels[i].Text = "";
+                    infoLabels[i].SetActive(false);
+                }
             }
         }
 

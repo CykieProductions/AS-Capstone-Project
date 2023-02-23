@@ -34,19 +34,27 @@ https://www.youtube.com/watch?v=qAWhGEPMlS8
 ----------------------------------------------------------------------------------------------------------------------------
  */
 
-using System.Numerics;
+
+using Capstone_Chronicles.GUI;
 using static System.Console;
 
 namespace Capstone_Chronicles
 {
     internal static class Program
     {
+        public static string Name { get; private set; } = "Capstone Chronicles";
         public static bool GameIsRunning { get; private set; } = true;
+        public static Action? OnExit;
 
         static void Main(string[] args)
         {
-            //GameManager.ChangeScene(GameManager.SceneFactory.TitleScreen);
-            GameManager.ChangeScene(GameManager.SceneFactory.GetBattleScene());
+            Console.Title = Name;
+#if !DEBUG
+            GameManager.ChangeScene(SceneFactory.TitleScreen);
+#else
+            GameManager.ChangeScene(SceneFactory.SorecordForest);
+#endif
+
             //This means the game stopped without properly exiting
             if (GameIsRunning)
             {
@@ -57,6 +65,7 @@ namespace Capstone_Chronicles
 
         public static void Exit()
         {
+            OnExit?.Invoke();
             GameIsRunning = false;
         }
 
@@ -66,63 +75,25 @@ namespace Capstone_Chronicles
 #if DEBUG
             if (GetCursorPosition().Left == 0)
                 Write("DEBUG: ");
-            Write(message.ToString() + (singleLine ? null : '\n'));
+            Write(message?.ToString() + (singleLine ? null : '\n'));
             //Thread.Sleep(TimeSpan.FromSeconds(2));
             ReadKey(true);
 #endif
         }
     }
 
-    public static class RNG
+    public static class Input
     {
-        public static Random Rand { get; private set; } = new Random(DateTime.Now.Millisecond);
+        public static ConsoleKey PauseKey { get; private set; } = ConsoleKey.Escape;
 
-        // Presets
-        public static bool OneInTwo { get => Chance(0.5f); }
-        public static bool OneInFour { get => Chance(0.25f); }
-        public static bool ThreeInFour { get => Chance(0.75f); }
-        public static bool OneInThree { get => Chance(1f / 3f); }
-        public static bool TwoInThree { get => Chance(2f / 3f); }
-
-        /*x// <summary>
-        /// Runs a check based on percent chance out of 100
-        /// </summary>
-        /// <param name="percentage">Between 0 and 100 (inclusive)</param>
-        public static bool Chance(int percentage)
+        public static bool GetKeyDown(ConsoleKey key)
         {
-            //Ensures 0 will always fail and 100 will always succeed
-            var rVal = Rand.Next(1, 101);
+            bool result = false;
 
-            if (rVal <= percentage)//Success condition
-                return true;
+            if (KeyAvailable && ReadKey(true).Key == key)
+                result = true;
 
-            return false;
-        }*/
-
-        /// <summary>
-        /// Runs a check based on percentage
-        /// </summary>
-        /// <param name="percentage">Between 0 and 1 (inclusive)</param>
-        public static bool Chance(float percentage)
-        {
-            //Ensures 0 will always fail and 100 will always succeed
-            var rVal = Rand.NextSingle() + float.Epsilon;
-
-            if (rVal <= percentage)//Success condition
-                return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Returns a random integer between to inclusive values
-        /// </summary>
-        public static int RandomInt(int inclusiveMin, int inclusiveMax)
-        {
-            if (inclusiveMin >= inclusiveMax)
-                throw new ArgumentOutOfRangeException("Arguments must create a valid range!");
-
-            return Rand.Next(inclusiveMin, inclusiveMax + 1);
+            return result;
         }
     }
 

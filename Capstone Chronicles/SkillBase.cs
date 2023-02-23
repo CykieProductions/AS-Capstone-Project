@@ -29,15 +29,15 @@ namespace Capstone_Chronicles
         }
         public enum TargetGroup
         {
-            NO_TARGET, TARGET_SINGLE_OPPONENT, TARGET_ALL_OPPONENTS, TARGET_SINGLE_ALLY, TARGET_ALL_ALLIES, TARGET_ANYONE, TARGET_EVERYONE
+            SELF, ONE_OPPONENT, ALL_OPPONENTS, ONE_ALLY, ALL_ALLIES, ANYONE, EVERYONE
         }
 
         public ActionType actionType { get; protected set; } = ActionType.DAMAGING;
-        public TargetGroup targetType { get; set; } = TargetGroup.NO_TARGET;
+        public TargetGroup targetType { get; set; } = TargetGroup.SELF;
         public Element element = ElementManager.NORMAL;
 
         //Constructor
-        public SkillBase(string name, int cost = 0, TargetGroup targetType = TargetGroup.NO_TARGET, Element? elmt = null, string info = "")
+        public SkillBase(string name, int cost = 0, TargetGroup targetType = TargetGroup.SELF, Element? elmt = null, string info = "")
         {
             Name = name;
             //_skillDescription = d;
@@ -72,13 +72,13 @@ namespace Capstone_Chronicles
     {
         public Action<T1> action { get; protected set; }
 
-        public Skill(string name, Action<T1> action, int cost = 0, TargetGroup targetType = TargetGroup.NO_TARGET
+        public Skill(string name, Action<T1> action, int cost = 0, TargetGroup targetType = TargetGroup.SELF
             , Element? elmt = null, int pri = 0, string info = "") : base(name, cost, targetType, elmt, info)
         {
             Priority = pri;
             this.action = action;
         }
-        public Skill(Skill<T1> skill) : base(name: "", cost: 0, targetType: TargetGroup.NO_TARGET, elmt: null, info: "")
+        public Skill(Skill<T1> skill) : base(name: "", cost: 0, targetType: TargetGroup.SELF, elmt: null, info: "")
         {
             Name = skill.Name;
             Info = skill.Info;
@@ -102,14 +102,14 @@ namespace Capstone_Chronicles
     {
         public Action<T1, T2> action { get; private set; }
 
-        public Skill(string name, Action<T1, T2> action, int cost = 0, TargetGroup targetType = TargetGroup.TARGET_SINGLE_OPPONENT
+        public Skill(string name, Action<T1, T2> action, int cost = 0, TargetGroup targetType = TargetGroup.ONE_OPPONENT
             , Element? elmt = null, ActionType skillType = ActionType.DAMAGING, int pri = 0, string info = "") : base(name, cost, targetType, elmt, info)
         {
             Priority = pri;
             this.action = action;
             actionType = skillType;
         }
-        public Skill(Skill<T1, T2> skill) : base(name: "", cost: 0, targetType: TargetGroup.TARGET_SINGLE_OPPONENT, elmt: null, info: "")
+        public Skill(Skill<T1, T2> skill) : base(name: "", cost: 0, targetType: TargetGroup.ONE_OPPONENT, elmt: null, info: "")
         {
             Name = skill.Name;
             Info = skill.Info;

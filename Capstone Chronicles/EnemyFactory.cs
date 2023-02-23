@@ -10,6 +10,7 @@ namespace Capstone_Chronicles
     internal class EnemyFactory
     {
         public static Enemy Test { get =>
-                new Enemy("Test", ElementManager.AIR, new Actor.StatsStruct(1, 10, 20, 2, 0, 1, 0, 2, 4)); }
+                new Enemy("Test", ElementManager.AIR, new Actor.StatsStruct(level: 1, maxHp: 10, maxSp: 20, 
+                    attack: 2, defense: 0, spAttack: 1, spDefense: 0, speed: 2, exp: 40)); }
     }
 }

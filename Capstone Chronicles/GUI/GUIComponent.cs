@@ -3,17 +3,18 @@
 namespace Capstone_Chronicles.GUI
 {
 
-    internal abstract class GUIComponent
+    public abstract class GUIComponent
     {
         public bool Enabled { get; protected set; }
         public Scene ParentScreen { get; private set; }
+
 
         public GUIComponent(bool inEnabled)
         {
             Enabled = inEnabled;
         }
 
-        public void SetActive(bool state, bool refresh = true)
+        public virtual void SetActive(bool state, bool refresh = true)
         {
             Enabled = state;
             if (refresh)
@@ -22,23 +23,26 @@ namespace Capstone_Chronicles.GUI
         public abstract void Display();
         public virtual void Display(params dynamic[] args) { Display(); }
 
+        protected virtual void OnAttachToScene() { }
+
         /// <summary>
         /// Should only be used in the Screen's constructor
         /// </summary>
         public void SetParentScreen(Scene inScreen)
         {
             ParentScreen = inScreen;
+            OnAttachToScene();
         }
     }
 
-    internal class Label : GUIComponent
+    public class Label : GUIComponent
     {
         public string Text { get; set; }
         public InteractiveGUI? AttachedInteractiveGUI { get; private set; }
         private Action? OnDynamicUpdate;
-        ColorSet colors;
+        public ColorSet? colors;
 
-        public Label(string inText, ColorSet inColorSet = default, bool inEnabled = true) 
+        public Label(string inText, ColorSet? inColorSet = default, bool inEnabled = true) 
             : base(inEnabled)
         {
             if (inColorSet.Equals(default(ColorSet)))
@@ -51,7 +55,7 @@ namespace Capstone_Chronicles.GUI
         /// Used to set up self-updating text.
         /// </summary>
         /// <param name="dynamicText">Function that updates the text each time it displays</param>
-        public Label(Action dynamicText, ColorSet inColorSet = default, bool inEnabled = true) 
+        public Label(Action dynamicText, ColorSet? inColorSet = default, bool inEnabled = true) 
             : base(inEnabled)
         {
             if (inColorSet.Equals(default(ColorSet)))
@@ -78,7 +82,7 @@ namespace Capstone_Chronicles.GUI
         /// </summary>
         /// <param name="format">The text format to display</param>
         /// <param name="data">Optional data to be inputted into the text</param>
-        public void SetText(string format, params object[] data)
+        public void SetDynamicText(string format, params object[] data)
         {
             if (data != null && data.Length != 0)
             {
@@ -93,12 +97,19 @@ namespace Capstone_Chronicles.GUI
 
         public override void Display()
         {
-            ForegroundColor = colors.foreground;
-            BackgroundColor = colors.background;
+            if (colors != null)
+            {
+                ForegroundColor = colors.Value.foreground;
+                BackgroundColor = colors.Value.background;
+            }
             OnDynamicUpdate?.Invoke();
-            WriteLine(Text);
-            ForegroundColor = ColorSet.DEFAULT_TEXT_COLOR;
-            BackgroundColor = ColorSet.DEFAULT_BACK_COLOR;
+            if (Text != "")
+                WriteLine(Text);
+            if (colors != null)
+            {
+                ForegroundColor = ColorSet.DEFAULT_TEXT_COLOR;
+                BackgroundColor = ColorSet.DEFAULT_BACK_COLOR;
+            }
         }
 
         /// <summary>
