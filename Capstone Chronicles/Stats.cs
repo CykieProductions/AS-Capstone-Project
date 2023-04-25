@@ -8,6 +8,11 @@ namespace Capstone_Chronicles
 {
     public partial class Actor
     {
+        public enum StatType
+        {
+            Max_HP, Max_SP, Attack, Defense, Special, Speed, Exp
+        }
+
         /// <summary> Used to initialize Actors in a cleaner looking way </summary>
         public struct StatsStruct
         {
@@ -19,14 +24,13 @@ namespace Capstone_Chronicles
 
             public int Attack { get; set; } = 2;
             public int Defense { get; set; } = 0;
-            public int SpAttack { get; set; } = 1;
-            public int SpDefense { get; set; } = 0;
+            public int Special { get; set; } = 1;
             public int Speed { get; set; } = 1;
             public int Exp { get; set; } = 5;
 
             //Fully custom constructor
             public StatsStruct(int level, int maxHp, int hp, int maxSp, int sp,
-                int attack, int defense, int spAttack, int spDefense, int speed, int exp)
+                int attack, int defense, int special, int speed, int exp)
             {
                 Level = level;
                 MaxHp = maxHp;
@@ -35,14 +39,13 @@ namespace Capstone_Chronicles
                 Sp = sp;
                 Attack = attack;
                 Defense = defense;
-                SpAttack = spAttack;
-                SpDefense = spDefense;
+                Special = special;
                 Speed = speed;
                 Exp = exp;
             }
             //Simplified constructor
             public StatsStruct(int level, int maxHp, int maxSp,
-                int attack, int defense, int spAttack, int spDefense, int speed, int exp = 0)
+                int attack, int defense, int special, int speed, int exp = 0)
             {
                 Level = level;
                 MaxHp = maxHp;
@@ -51,11 +54,11 @@ namespace Capstone_Chronicles
                 Sp = MaxSp;
                 Attack = attack;
                 Defense = defense;
-                SpAttack = spAttack;
-                SpDefense = spDefense;
+                Special = special;
                 Speed = speed;
                 Exp = exp;
             }
+
         }
     }
 }

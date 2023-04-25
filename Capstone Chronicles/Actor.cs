@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//TODO remove this
-//using static Capstone_Chronicles.Program;/*
-using static Capstone_Chronicles.Scene;//*/
+using static Capstone_Chronicles.Scene;
 
 namespace Capstone_Chronicles
 {
     /// <summary>
     /// Actors participate in battles. 
     /// </summary>
-    public partial class Actor
+    public abstract partial class Actor
     {
         //Contains nested struct*/ StatsStruct
         //Contains nested class*/ StatGrowth
@@ -34,8 +32,7 @@ namespace Capstone_Chronicles
 
         public int Attack { get; protected set; }
         public int Defense { get; protected set; }
-        public int SpAttack { get; protected set; }
-        public int SpDefense { get; protected set; }
+        public int Special { get; protected set; }
         public int Speed { get; protected set; }
         public int Exp { get; set; }
         #endregion
@@ -59,11 +56,26 @@ namespace Capstone_Chronicles
         public const int MAX_LEVEL = 100;
         public const float EFFECT_CAPACITY = 3;
 
+        /// <summary>
+        /// Fills in basic info and will update the usable skill list based on the inputted level and skill dictionary
+        /// </summary>
+        /// <param name="inName"></param>
+        /// <param name="inElement"></param>
+        /// <param name="inStats">A struct containing all stat data</param>
+        /// <param name="inSkillDict"></param>
         public Actor(string inName, Element inElement, StatsStruct inStats, Dictionary<int, SkillBase> inSkillDict)
         {
             Name = inName;
             Element = inElement;
             levelUpSkillDictionary = inSkillDict;
+
+            //Learn any skills lower than or equal to current level
+            for (int i = 0; i <= Level; i++)
+            {
+                levelUpSkillDictionary.TryGetValue(i, out SkillBase? newSkill);
+                if (newSkill != null)
+                    LearnSkill(newSkill, false);
+            }
 
             Level = inStats.Level;
             MaxHp = inStats.MaxHp;
@@ -72,10 +84,21 @@ namespace Capstone_Chronicles
             Sp = inStats.Sp;
             Attack = inStats.Attack;
             Defense = inStats.Defense;
-            SpAttack = inStats.SpAttack;
-            SpDefense = inStats.SpDefense;
+            Special = inStats.Special;
             Speed = inStats.Speed;
             Exp = inStats.Exp;
+        }
+
+        /// <summary>
+        /// Adds a new skill to the Actor's usable skill list
+        /// </summary>
+        /// <param name="newSkill">The new skill to be learned</param>
+        /// <param name="display">Should the player be alerted about the new skill</param>
+        public virtual void LearnSkill(SkillBase newSkill, bool display = false)
+        {
+            skills.Add(newSkill);
+            if (display)
+                print($"{Name} learned {newSkill.Name}!");
         }
 
         /// <summary>
@@ -184,34 +207,28 @@ namespace Capstone_Chronicles
 
             return Hp - startHp;
         }
-
-        public virtual void ModifyConra(int value, Element? attackElement = null)
+        public void SetHealth (int value)
         {
-            attackElement ??= ElementManager.OMNI;
+            Hp = value.Clamp(0, MaxHp);
+        }
 
+        public virtual void ModifyStamina(int value)
+        {
             if (value > 0)
             {
-
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                /*if (Sp + value < MaxSp)
+                if (Sp + value < MaxSp)
                     print(Name + " gained " + value + " SP");
                 else
-                    print(Name + "'s SP is maxed out");*/
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                float mult = ElementManager.CalculateAttackMultiplier(attackElement, this);
-                value = (int)(value * mult);
-
-                //x print("SP loss has been multiplied by " + mult);
-
-                Console.ForegroundColor = ConsoleColor.Blue;
-                //print(Name + " lost " + -value + " SP");
+                    print(Name + "'s SP is maxed out");
                 Console.ForegroundColor = ConsoleColor.White;
             }
 
             Sp = (Sp + value).Clamp(0, MaxSp);
+        }
+        public void SetStamina(int value)
+        {
+            Sp = value.Clamp(0, MaxSp);
         }
     }
 
@@ -220,7 +237,7 @@ namespace Capstone_Chronicles
     /// </summary>
     public class Hero : Actor
     {
-        int neededExp = 4;
+        public int NeededExp { get; private set; } = 4;
         public StatGrowth GrowthInfo { get; private set; }
         public static event Action<StatGrowth, Actor>? AfterInit;
 
@@ -231,30 +248,20 @@ namespace Capstone_Chronicles
             //TODO implement StatGrowth
             GrowthInfo = inGrowthInfo;
 
-            //Learn any skills lower than or equal to current level
-            for (int i = 0; i <= Level; i++)
-            {
-                levelUpSkillDictionary.TryGetValue(i, out SkillBase? newSkill);
-                if (newSkill != null)
-                    LearnSkill(newSkill, false);
-            }
-
             AfterInit?.Invoke(GrowthInfo, this);
         }
 
         private void SortSkills()
         {
-            skills = skills.OrderBy(x => x.actionType).ThenBy(x => x.element.NameFromEnum).
+            skills = skills.OrderBy(x => x.actionType).ThenBy(x => x.element.Name).
                 ThenBy(x => x.targetType).ThenBy(x => x.Cost).ToList();
         }
 
-        public void LearnSkill(SkillBase newSkill, bool display = true)
+        public override void LearnSkill(SkillBase newSkill, bool display = true)
         {
             if (!skills.Contains(newSkill)) //Heroes shouldn't have duplicate skills, but enemies can
             {
-                skills.Add(newSkill);
-                if (display)
-                    print($"{Name} learned {newSkill.Name}!");
+                base.LearnSkill(newSkill);
             }
 
             SortSkills();
@@ -265,16 +272,27 @@ namespace Capstone_Chronicles
         /// </summary>
         public void TryLevelUp()
         {
-            while (Exp >= neededExp)
+            while (Exp >= NeededExp)
             {
                 Level++;
-                Exp -= neededExp;
+                Exp -= NeededExp;
 
-                //TODO Stat Growth (including neededExp)
+                Console.ForegroundColor = ConsoleColor.Green;
+                print($"{Name} has reached LV {Level}!");
+                Console.ForegroundColor = ConsoleColor.White;
 
-                GrowthInfo.AttackGain();
+                //! Stat Growth
 
-                //
+                MaxHp = GrowthInfo.StatGain(StatType.Max_HP);
+                Hp = MaxHp;
+                MaxSp = GrowthInfo.StatGain(StatType.Max_SP);
+                Sp = MaxSp;
+                Attack = GrowthInfo.StatGain(StatType.Attack);
+                Defense = GrowthInfo.StatGain(StatType.Defense);
+                Special = GrowthInfo.StatGain(StatType.Special);
+                Speed = GrowthInfo.StatGain(StatType.Speed);
+                NeededExp = GrowthInfo.StatGain(StatType.Exp, false);
+
 
                 //! Skills
                 levelUpSkillDictionary.TryGetValue(Level, out SkillBase? newSkill);
@@ -295,10 +313,43 @@ namespace Capstone_Chronicles
         /// </summary>
         public Func<SkillBase> decideTurnAction;
 
-        public Enemy(string inName, Element inElement, StatsStruct inStats, Func<SkillBase>? ai = null)
-            : base(inName, inElement, inStats, null/*TODO fix*/)
+        public Enemy(string inName, Element inElement, StatsStruct inStats, List<SkillBase>? inSkills,
+            Dictionary<int, SkillBase>? inSkillDict = null, Func<SkillBase>? ai = null)
+            : base(inName, inElement, inStats, inSkillDict ?? new())
         {
-            //TODO add skills based on current level and the skill dictionary
+            //Add the list of default skills to any learned through "level up"
+            if (inSkills != null)
+                skills.AddRange(inSkills);
+
+            //Normal attack should come last
+            skills.Add(SkillManager.Attack);
+
+            if (ai != null)
+                decideTurnAction = ai;
+            else
+                decideTurnAction = () => { return DecideTurnAction(); };
+        }
+        /// <summary>
+        /// Create a duplicate of an enemy, but with a different name and/or AI
+        /// </summary>
+        /// <param name="enemy"></param>
+        /// <param name="inName"></param>
+        /// <param name="ai"></param>
+        public Enemy(Enemy enemy, string? inName = null, Func<SkillBase>? ai = null)
+            : base(inName ?? enemy.Name, enemy.Element, default, enemy.levelUpSkillDictionary)
+        {
+            Level = enemy.Level;
+            MaxHp = enemy.MaxHp;
+            Hp = enemy.Hp;
+            MaxSp = enemy.MaxSp;
+            Sp = enemy.Sp;
+            Attack = enemy.Attack;
+            Defense = enemy.Defense;
+            Special = enemy.Special;
+            Speed = enemy.Speed;
+            Exp = enemy.Exp;
+
+            skills = enemy.skills;
 
             //Normal attack should come last
             skills.Add(SkillManager.Attack);
@@ -319,7 +370,7 @@ namespace Capstone_Chronicles
             }
 
             var randInt = RNG.RandomInt(0, skillPool.Count);
-            if (randInt == skillPool.Count)//Basic Attack is last so this leaves an increased chance for that
+            if (randInt == skillPool.Count)//Basic Attack is last so this creates an increased chance for that
                 randInt = skillPool.Count - 1;
 
             return skillPool[randInt];

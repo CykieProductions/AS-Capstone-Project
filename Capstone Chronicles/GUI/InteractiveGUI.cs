@@ -205,6 +205,9 @@ namespace Capstone_Chronicles.GUI
 
         public override void Display()
         {
+            //Intercept any buffered inputs
+            while (Console.KeyAvailable) Console.ReadKey(true);
+
             Prompt?.Display();
 
             //ensure button index is in bounds
@@ -287,6 +290,14 @@ namespace Capstone_Chronicles.GUI
             while (GameManager.ActiveInteractiveElement == this)
             {
                 var inputKey = ReadKey(true);
+
+                //! Back Function
+                if (inputKey.Key == ConsoleKey.Escape && Scene.CanGoBack)
+                {
+                    Scene.BackButtonPressed();
+                    TryClose(true);
+                    return;
+                }
 
                 bool down = inputKey.Key == ConsoleKey.DownArrow;
                 bool up = inputKey.Key == ConsoleKey.UpArrow;

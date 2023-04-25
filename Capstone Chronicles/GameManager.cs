@@ -30,9 +30,14 @@ namespace Capstone_Chronicles
             CurrentScene?.Start();
         }
 
-        //TODO implement a proper game over sequence
+        //TODO implement a proper game over sequence and LOADING
         public static void GameOver()
         {
+            foreach (var hero in HeroManager.Party)
+            {
+                hero.SetHealth(hero.MaxHp);
+                hero.SetStamina(hero.MaxSp);
+            }
             ChangeScene(SceneFactory.TitleScreen);
         }
     }

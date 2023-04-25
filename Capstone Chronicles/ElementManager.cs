@@ -13,51 +13,51 @@ namespace Capstone_Chronicles
         /// Weak To: nothing |
         /// Resists: nothing
         /// </summary>
-        public static Element OMNI { get; private set; } = new Element(Element.Name.OMNI);
+        public static Element OMNI { get; private set; } = new Element(Element.Type.OMNI);
 
         /// <summary>
         /// Weak To: nothing |
         /// Resists: nothing
         /// </summary>
-        public static Element NORMAL { get; private set; } = new Element(Element.Name.NORMAL);
+        public static Element NORMAL { get; private set; } = new Element(Element.Type.NORMAL);
 
         /// <summary>
         /// Weak To: water, ground, air |
         /// Resists: fire, plant, electric
         /// </summary>
-        public static Element FIRE { get; private set; } = new Element(Element.Name.FIRE);
+        public static Element FIRE { get; private set; } = new Element(Element.Type.FIRE);
 
         /// <summary>
         /// Weak To: plant, electric |
         /// Resists: water, ground
         /// </summary>
-        public static Element WATER { get; private set; } = new Element(Element.Name.WATER);
+        public static Element WATER { get; private set; } = new Element(Element.Type.WATER);
 
         /// <summary>
         /// Weak To: fire |
         /// Resists: water
         /// </summary>
-        public static Element PLANT { get; private set; } = new Element(Element.Name.PLANT);
+        public static Element PLANT { get; private set; } = new Element(Element.Type.PLANT);
 
         /// <summary>
         /// Weak To: water, plant |
         /// Resists: normal, fire |
         /// Ignores: electric
         /// </summary>
-        public static Element GROUND { get; private set; } = new Element(Element.Name.GROUND);
+        public static Element GROUND { get; private set; } = new Element(Element.Type.GROUND);
 
         /// <summary>
         /// Weak To: electric |
         /// Resists: air |
         /// Ignores: normal, ground
         /// </summary>
-        public static Element AIR { get; private set; } = new Element(Element.Name.AIR);
+        public static Element AIR { get; private set; } = new Element(Element.Type.AIR);
 
         /// <summary>
         /// Weak To: ground |
         /// Resist: air, electric
         /// </summary>
-        public static Element ELECTRIC { get; private set; } = new Element(Element.Name.ELECTRIC);
+        public static Element ELECTRIC { get; private set; } = new Element(Element.Type.ELECTRIC);
         #endregion
 
         //Static constructor to initialize the strengths and weaknesses of all above elements
@@ -185,11 +185,11 @@ namespace Capstone_Chronicles
 
     public class Element
     {
-        public enum Name
+        public enum Type
         {
             OMNI, NORMAL, FIRE, WATER, PLANT, GROUND, AIR, ELECTRIC
         }
-        public Name NameFromEnum { get; private set; }
+        public string Name { get; private set; }
 
 
         private Element[] effectiveAgainst = null;
@@ -206,13 +206,25 @@ namespace Capstone_Chronicles
         /// <param name="ineffectiveAgainst">Elements that I do reduced damage to</param>
         /// <param name="uselessAgainst">Elements that I can't affect</param>
         /// <param name="unfazedBy">Ensures I can't be affected by the basic elements. Only used for temporary elements</param>
-        public Element(Name inName, Element[]? effectiveAgainst = null, Element[]? ineffectiveAgainst = null, 
+        public Element(Type inName, Element[]? effectiveAgainst = null, Element[]? ineffectiveAgainst = null, 
             Element[]? uselessAgainst = null, Element[]? unfazedBy = null) 
         {
-            NameFromEnum = inName;
+            Name = inName.ToString();
             this.effectiveAgainst = effectiveAgainst;
             this.ineffectiveAgainst = ineffectiveAgainst;
             this.uselessAgainst = uselessAgainst;
+
+            if (unfazedBy != null)
+                this.unfazedBy = unfazedBy;
+        }
+
+        public Element(Element baseElement, string? inName = null, Element[]? unfazedBy = null, Element[]? effectiveAgainst = null, Element[]? ineffectiveAgainst = null,
+            Element[]? uselessAgainst = null)
+        {
+            Name = inName ?? baseElement.Name;
+            this.effectiveAgainst = effectiveAgainst ?? baseElement.effectiveAgainst;
+            this.ineffectiveAgainst = ineffectiveAgainst ?? baseElement.ineffectiveAgainst;
+            this.uselessAgainst = uselessAgainst ?? baseElement.uselessAgainst;
 
             if (unfazedBy != null)
                 this.unfazedBy = unfazedBy;

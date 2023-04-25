@@ -54,17 +54,18 @@ namespace Capstone_Chronicles
 
             Priority = 0;
 
-            SkillManager.callForSkill += TryGetSkill;//get skill by name without exact without using reflections
+            SkillManager.callForSkill += TryGetSkill;//get skill by name without using reflection
         }
 
         //Methods
-        void TryGetSkill(string name)//called from SkillManager.GetSkillByName
+        SkillBase? TryGetSkill(string name)//called from SkillManager.GetSkillByName
         {
             if (name == Name)
             {
-                SkillManager.requestedSkill = this;
-                return;
+                return this;
             }
+
+            return null;
         }
     }
 

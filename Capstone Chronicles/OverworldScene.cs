@@ -44,6 +44,11 @@ namespace Capstone_Chronicles
                         menu.closeAfterConfirm = false;
                     }
                 }),
+                new Button("Stats", menu =>
+                {
+                    curHero = RunTargetMenu();
+                    DisplayStats(curHero);
+                }),
                 new Button("Save", menu =>
                 {
                     curHero.nextAction = SkillManager.Guard;
@@ -53,6 +58,8 @@ namespace Capstone_Chronicles
                     GameManager.ChangeScene(SceneFactory.TitleScreen);
                 }),
             });
+
+
         static Menu actionMenu = ActionMenuTemplate.ShallowCopy();
 
         static Menu skillMenu = SkillMenuTemplate.ShallowCopy();
@@ -125,6 +132,48 @@ namespace Capstone_Chronicles
             return target;
         }
 
+        private static void DisplayStats(Hero curHero)
+        {
+            Current.ToggleInfoLabels(true);
+
+            string effectsText = "";
+
+            for (int i = 0; i < curHero.statusEffects.Count; i++)
+            {
+                if (effectsText != "")
+                    effectsText += ", ";
+                effectsText += curHero.statusEffects[i]?.Name;
+            }
+
+            if (effectsText != "")
+                effectsText = "\n" + effectsText;
+
+            print(
+$@"    {curHero.Name}
+Element: {curHero.Element.Name}
+", true, 0); 
+
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            print(effectsText, true, 0);
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            print(
+$@"
+HP: {curHero.Hp}/{curHero.MaxHp}
+SP: {curHero.Sp}/{curHero.MaxSp}
+
+Attack: {curHero.Attack}
+Defense: {curHero.Defense}
+Special: {curHero.Special}
+Speed: {curHero.Speed}
+Exp to Next Level: {curHero.Exp}/{curHero.NeededExp}",
+            true, -1);
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Current.ToggleInfoLabels(false);
+        }
+
         static void RunSkillMenu()
         {
             skillMenu.ClearOptions(false);
@@ -158,6 +207,5 @@ namespace Capstone_Chronicles
             skillMenu.SetActive(true);
             Current.ToggleInfoLabels(false);
         }
-
     }
 }

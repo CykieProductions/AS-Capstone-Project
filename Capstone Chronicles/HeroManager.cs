@@ -14,8 +14,16 @@ namespace Capstone_Chronicles
         static Hero InitPlayer()
         {
             var stats = new Actor.StatsStruct(level: 1, maxHp: 40, hp: 9999, maxSp: 9_16, sp: 9999,
-                attack: 5, defense: 0, spAttack: 3, spDefense: 0, speed: 5, exp: 0);
-            var growthInfo = new Hero.StatGrowth();
+                attack: 5, defense: 0, special: 3, speed: 5, exp: 0);
+            var growthInfo = new StatGrowth(
+                _hpInfo: (StatGrowth.GrowthCurve.Log, 1.5f),
+                _spInfo: (StatGrowth.GrowthCurve.Square, 1f),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, .9f),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, .1f),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
+                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
+                );
 
             var skillDict = new Dictionary<int, SkillBase>()
             {
@@ -65,8 +73,16 @@ namespace Capstone_Chronicles
         static Hero InitRezy()
         {
             var stats = new Actor.StatsStruct(level: 1, maxHp: 36, maxSp: 9_24,
-                attack: 2, defense: 0, spAttack: 4, spDefense: 0, speed: 6);
-            var growthInfo = new Hero.StatGrowth();
+                attack: 2, defense: 0, special: 4, speed: 6);
+            var growthInfo = new StatGrowth(
+                _hpInfo: (StatGrowth.GrowthCurve.Log, 1.2f),
+                _spInfo: (StatGrowth.GrowthCurve.Square, .8f),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, 1f),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
+                _speedInfo: (StatGrowth.GrowthCurve.Linear, 0f),
+                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
+                );
 
             var skillDict = new Dictionary<int, SkillBase>()
             {
@@ -107,8 +123,16 @@ namespace Capstone_Chronicles
         static Hero InitFoo()
         {
             var stats = new Actor.StatsStruct(level: 1, maxHp: 32, maxSp: 9_24,
-                attack: 4, defense: 0, spAttack: 4, spDefense: 0, speed: 1);
-            var growthInfo = new Hero.StatGrowth();
+                attack: 4, defense: 0, special: 4, speed: 1);
+            var growthInfo = new StatGrowth(
+                _hpInfo: (StatGrowth.GrowthCurve.Log, 1.1f),
+                _spInfo: (StatGrowth.GrowthCurve.Log, 1),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
+                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
+                );
 
             var skillDict = new Dictionary<int, SkillBase>()
             {
@@ -121,10 +145,10 @@ namespace Capstone_Chronicles
                 [42] = SkillManager.Supernova,
             };
 
-            var hero = new Hero("Foo", stats, growthInfo, skillDict);
+            var hero = new Hero("Foo", stats, growthInfo, skillDict, ElementManager.FIRE);
 
             //TODO remove
-            /*hero.skills = new()
+            hero.skills = new()
             {
                 SkillManager.Damage_Allies_Test,
                 SkillManager.Ignite_Allies_Test,
@@ -144,8 +168,16 @@ namespace Capstone_Chronicles
         static Hero InitTessa()
         {
             var stats = new Actor.StatsStruct(level: 1, maxHp: 36, maxSp: 9_24,
-                attack: 2, defense: 0, spAttack: 5, spDefense: 0, speed: 3);
-            var growthInfo = new Hero.StatGrowth();
+                attack: 2, defense: 0, special: 5, speed: 3);
+            var growthInfo = new StatGrowth(
+                _hpInfo: (StatGrowth.GrowthCurve.Log, 1),
+                _spInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _attackInfo: (StatGrowth.GrowthCurve.Linear, 1),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
+                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.5f)
+                );
 
             var skillDict = new Dictionary<int, SkillBase>()
             {
@@ -165,7 +197,7 @@ namespace Capstone_Chronicles
                 [42] = SkillManager.Tsunami,
             };
 
-            var hero = new Hero("Tessa", stats, growthInfo, skillDict, ElementManager.PLANT);
+            var hero = new Hero("Tessa", stats, growthInfo, skillDict, ElementManager.NORMAL);
 
             //TODO remove
             /*hero.skills = new()

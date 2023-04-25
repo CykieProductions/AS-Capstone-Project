@@ -63,7 +63,7 @@ namespace Capstone_Chronicles
 
             //The components are filled out by the BattleScene itself
             //Switching to this scene will automatically trigger a battle
-            return new BattleScene(EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test, EnemyFactory.Test);
+            return new BattleScene(EnemyFactory.Boss_Leviac);
         }
     }
 

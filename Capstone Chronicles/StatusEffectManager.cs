@@ -146,7 +146,14 @@ namespace Capstone_Chronicles
             recoverAction = dupe.recoverAction;
         }
 
-
+        /// <summary>
+        /// Attempt to give the target this status effect
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="duration">The amount of turn it should last (-1 means random)</param>
+        /// <param name="showInflictText"></param>
+        /// <param name="performImmediately">Should the status effect perform its action now, even if it's out of turn</param>
+        /// <returns></returns>
         public bool TryInflict(Actor target, int duration = -1, bool showInflictText = true, bool performImmediately = false)
         {
             if (target.Hp <= 0)

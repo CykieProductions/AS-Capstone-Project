@@ -17,6 +17,12 @@ namespace Capstone_Chronicles
         /// </summary>
         public static Scene Current { get => GameManager.CurrentScene; }
         public static Scene Previous { get => GameManager.PreviousScene; }
+        public static bool CanGoBack { get; protected set; }
+
+        /// <summary>
+        /// Set false when the scene refreshes or changes
+        /// </summary>
+        protected static bool goBack;
 
         readonly Action? OnStart = null;
         readonly Action? OnExit = null;
@@ -80,6 +86,12 @@ namespace Capstone_Chronicles
             newElement.SetActive(enabled, false);
         }
 
+        public static void BackButtonPressed()
+        {
+            if (CanGoBack)
+                goBack = true;
+        }
+
         public void Refresh()
         {
             Console.Clear();
@@ -89,6 +101,7 @@ namespace Capstone_Chronicles
                     elements[i].Display();
             }
 
+            goBack = false;
             OnRenderComplete?.Invoke();
         }
 
@@ -106,7 +119,7 @@ namespace Capstone_Chronicles
 
             string targetText = skill.targetType.ToString().Replace('_', ' ');
 
-            skillInfoLabel.Text = $"Skill Info: \nCost: {skill.Cost} | Element: {skill.element.NameFromEnum} " +
+            skillInfoLabel.Text = $"Skill Info: \nCost: {skill.Cost} | Element: {skill.element.Name} " +
                 $"| Type: {skill.actionType} | Targets: {targetText}";
 
         }
@@ -139,15 +152,22 @@ namespace Capstone_Chronicles
             }
 
             //Allow player to skip the delay between lines
-            int iterations = 5;
-            for (int i = 0; i < iterations; i++)
+            if (delayAfter > 0)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(delayAfter / iterations));
-                if (Console.KeyAvailable)
+                int iterations = 5;
+                for (int i = 0; i < iterations; i++)
                 {
-                    Console.ReadKey(true);
-                    break;
+                    Thread.Sleep(TimeSpan.FromSeconds(delayAfter / iterations));
+                    if (Console.KeyAvailable)
+                    {
+                        Console.ReadKey(true);
+                        break;
+                    }
                 }
+            }
+            else if (delayAfter < 0)
+            {
+                Console.ReadKey(true);
             }
         }
 
@@ -184,6 +204,8 @@ namespace Capstone_Chronicles
         /// </summary>
         public virtual void Exit()
         {
+            goBack = false;
+            CanGoBack = false;
             OnExit?.Invoke();
         }
     }

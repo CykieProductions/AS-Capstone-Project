@@ -10,10 +10,9 @@ using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
-    public class SkillManager
+    public static class SkillManager
     {
-        public static Action<string> callForSkill;
-        public static SkillBase requestedSkill;
+        public static event Func<string, SkillBase?> callForSkill;
 
         #region All Skills
         public static Skill<Actor> Skip_Turn { get; private set; }
@@ -146,7 +145,7 @@ namespace Capstone_Chronicles
             if (rank >= 3)
                 rankDamper = 0.64f;
 
-            int amount = (int)(baseValue * Math.Sqrt(Math.Pow(user.SpAttack, (rank * rankDamper).Clamp(1, 50))) * scalar);
+            int amount = (int)(baseValue * Math.Sqrt(Math.Pow(user.Special, (rank * rankDamper).Clamp(1, 50))) * scalar);
             if (varyDamage)
                 amount += RNG.RandomInt(-(int)(amount * 0.1f), (int)(amount * 0.1f));
             return amount;
@@ -194,7 +193,7 @@ namespace Capstone_Chronicles
                 print('-'.Repeat(36));
                 print($"Scan results for {target.Name}:");
                 print($"LV: {target.Level}");
-                print($"ELMT: {target.Element.NameFromEnum}");
+                print($"ELMT: {target.Element.Name}");
 
                 target.statusEffects.RemoveAll(x => x == null);
                 if (target.statusEffects.Count > 0)
@@ -236,7 +235,7 @@ namespace Capstone_Chronicles
             Sleep = new Skill<Actor>("Sleep", (user) =>
             {
                 print($"{user.Name} is fast asleep");
-                user.ModifyConra(RNG.RandomInt(1, 3));
+                user.ModifyStamina(RNG.RandomInt(1, 3));
             });
 
             Immobile = new Skill<Actor>("Can't Move", (user) =>
@@ -348,7 +347,7 @@ namespace Capstone_Chronicles
 
                     foreach (var target in targets)
                     {
-                        target.ModifyConra(target.MaxSp);
+                        target.ModifyStamina(target.MaxSp);
                     }
 
                     user.Sp -= curSkill.Cost;
@@ -1399,31 +1398,27 @@ namespace Capstone_Chronicles
 
         }
 
+        /// <summary>
+        /// Uses the inputted name to request a reference to a skill
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>The requested skill or null</returns>
         public static SkillBase? GetSkillByName(string? name)
         {
             if (name == null)
                 return null;
 
-            callForSkill.Invoke(name);
-            var skill = requestedSkill;
+            SkillBase? skill = null;
+            var delegates = callForSkill.GetInvocationList();
 
-            if (skill == null)//use reflections as back up
+            foreach (var del in delegates)
             {
-                name = name.Replace(' ', '_');
-                var field = typeof(SkillManager).GetField(name, BindingFlags.Public | BindingFlags.Static);
+                skill = ((Func<string, SkillBase>)del).Invoke(name);
+                if (skill != null)
+                    break;
+            }
 
-                if (field.GetValue(null) is SkillBase)
-                {
-                    //print((field.GetValue(null) as SkillBase).Name);
-                    return field.GetValue(null) as SkillBase;
-                }
-                return null;
-            }
-            else
-            {
-                requestedSkill = null;
-                return skill;
-            }
+            return skill;
         }
     }
 }
