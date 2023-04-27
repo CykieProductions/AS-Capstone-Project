@@ -52,7 +52,7 @@ namespace Capstone_Chronicles
 #if !DEBUG
             GameManager.ChangeScene(SceneFactory.TitleScreen);
 #else
-            GameManager.ChangeScene(SceneFactory.SorecordForest);
+            GameManager.ChangeScene(SceneFactory.Overworld);
 #endif
 
             //This means the game stopped without properly exiting
@@ -155,7 +155,17 @@ namespace Capstone_Chronicles
             return v;
         }
 
+        public static T GetRandomElement<T>(this IEnumerable<T> sequence)
+        {
+            return sequence.ElementAt(RNG.Rand.Next(0, sequence.Count()));
+        }
+        public static void RemoveRandomElement<T>(this ICollection<T> sequence)
+        {
+            sequence.Remove(sequence.ElementAt(RNG.Rand.Next(0, sequence.Count)));
+        }
+
         //https://stackoverflow.com/questions/56692/random-weighted-choice
+        ///<summary>NOT MY CODE</summary>
         public static T RandomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, float> weightSelector)
         {
             float totalWeight = sequence.Sum(weightSelector);

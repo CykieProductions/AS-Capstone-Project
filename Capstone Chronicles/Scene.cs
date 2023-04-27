@@ -23,6 +23,7 @@ namespace Capstone_Chronicles
         /// Set false when the scene refreshes or changes
         /// </summary>
         protected static bool goBack;
+        public static bool EnablePrinting { get; set; } = true;
 
         readonly Action? OnStart = null;
         readonly Action? OnExit = null;
@@ -133,7 +134,8 @@ namespace Capstone_Chronicles
         /// <param name="delayAfter"></param>
         public static void print<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
         {
-            GameManager.CurrentScene.Log(message, singleLine, delayAfter);
+            if (EnablePrinting)
+                GameManager.CurrentScene?.Log(message, singleLine, delayAfter);
         }
 
         protected virtual void Log<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
@@ -195,6 +197,7 @@ namespace Capstone_Chronicles
         /// </summary>
         public virtual void Start()
         {
+            EnablePrinting = true;
             Refresh();
             OnStart?.Invoke();
         }

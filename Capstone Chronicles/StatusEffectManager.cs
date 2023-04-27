@@ -30,7 +30,7 @@ namespace Capstone_Chronicles
             print(target.Name + " got burned by the flames");
             Console.ForegroundColor = ConsoleColor.White;
 
-            var baseDamage = (target.MaxHp / 3f).Clamp(1, 40);
+            var baseDamage = (target.MaxHp / 8f).Clamp(1, 30);
             target.ModifyHealth(-(int)(baseDamage + RNG.RandomInt(-(int)(baseDamage / 5).Clamp(2, 10),
                 (int)(baseDamage / 5).Clamp(2, 10))), atkElmt: ElementManager.FIRE,
                 ignoreGuard: true);

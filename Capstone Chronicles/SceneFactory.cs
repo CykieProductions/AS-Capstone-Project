@@ -11,7 +11,7 @@ namespace Capstone_Chronicles
                 InputField nameField = new InputField("What is your name?", input =>
                 {
                     HeroManager.Player.Name = input;
-                    GameManager.ChangeScene(SorecordForest);
+                    GameManager.ChangeScene(Overworld);
                 }, false);
 
                 var options = new List<Button>() {
@@ -50,21 +50,17 @@ namespace Capstone_Chronicles
             }
         }
 
-        public static OverworldScene SorecordForest
-        {
-            get
-            {
-                return new OverworldScene(null, null, Array.Empty<GUIComponent>());
-            }
-        }
+        public static OverworldScene Overworld { get; } = new OverworldScene(AreaManager.SorecordForest);
 
-        public static BattleScene GetBattleScene()
+
+        public static BattleScene GetBattleScene(Encounter encounter)
         {
 
             //The components are filled out by the BattleScene itself
             //Switching to this scene will automatically trigger a battle
-            return new BattleScene(EnemyFactory.Boss_Leviac);
+            return new BattleScene(encounter);
         }
+
     }
 
 }

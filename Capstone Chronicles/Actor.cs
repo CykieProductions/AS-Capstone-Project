@@ -173,8 +173,10 @@ namespace Capstone_Chronicles
 
                     if (!ignoreGuard && isGuarding && amount < 0)//Don't bother guarding 0 damage attacks
                     {
-                        amount = (int)(amount * 0.6f).Clamp(int.MinValue, -1);
+                        amount = (int)(amount * 0.6f);
                     }
+
+                    amount = amount.Clamp(int.MinValue, -1);
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     print(Name + " took " + -amount + " damage");
@@ -248,7 +250,10 @@ namespace Capstone_Chronicles
             //TODO implement StatGrowth
             GrowthInfo = inGrowthInfo;
 
+            SortSkills();
+
             AfterInit?.Invoke(GrowthInfo, this);
+            TryLevelUp();
         }
 
         private void SortSkills()
@@ -270,12 +275,14 @@ namespace Capstone_Chronicles
         /// <summary>
         /// The hero will attempt to level up as many times as they can
         /// </summary>
-        public void TryLevelUp()
+        public void TryLevelUp(bool display = true)
         {
             while (Exp >= NeededExp)
             {
                 Level++;
                 Exp -= NeededExp;
+
+                Scene.EnablePrinting = display;
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 print($"{Name} has reached LV {Level}!");
@@ -283,21 +290,27 @@ namespace Capstone_Chronicles
 
                 //! Stat Growth
 
-                MaxHp = GrowthInfo.StatGain(StatType.Max_HP);
+                var hpGain = GrowthInfo.StatGain(StatType.Max_HP);
+                MaxHp += hpGain;
                 Hp = MaxHp;
-                MaxSp = GrowthInfo.StatGain(StatType.Max_SP);
-                Sp = MaxSp;
-                Attack = GrowthInfo.StatGain(StatType.Attack);
-                Defense = GrowthInfo.StatGain(StatType.Defense);
-                Special = GrowthInfo.StatGain(StatType.Special);
-                Speed = GrowthInfo.StatGain(StatType.Speed);
-                NeededExp = GrowthInfo.StatGain(StatType.Exp, false);
+
+                var spGain = GrowthInfo.StatGain(StatType.Max_SP);
+                MaxSp += spGain;
+                Sp += spGain;
+                
+                Attack += GrowthInfo.StatGain(StatType.Attack);
+                Defense += GrowthInfo.StatGain(StatType.Defense);
+                Special += GrowthInfo.StatGain(StatType.Special);
+                Speed += GrowthInfo.StatGain(StatType.Speed);
+                NeededExp += GrowthInfo.StatGain(StatType.Exp, false);
 
 
                 //! Skills
                 levelUpSkillDictionary.TryGetValue(Level, out SkillBase? newSkill);
                 if (newSkill != null)
                     LearnSkill(newSkill);
+
+                Scene.EnablePrinting = true;
             }
         }
 
@@ -335,29 +348,41 @@ namespace Capstone_Chronicles
         /// <param name="enemy"></param>
         /// <param name="inName"></param>
         /// <param name="ai"></param>
-        public Enemy(Enemy enemy, string? inName = null, Func<SkillBase>? ai = null)
-            : base(inName ?? enemy.Name, enemy.Element, default, enemy.levelUpSkillDictionary)
+        public Enemy(Enemy enemy, int lv = 0, string? inName = null, Func<SkillBase>? ai = null)
+            : base(inName ?? enemy.Name, enemy.Element, new StatsStruct(enemy, lv), enemy.levelUpSkillDictionary)
         {
-            Level = enemy.Level;
-            MaxHp = enemy.MaxHp;
-            Hp = enemy.Hp;
-            MaxSp = enemy.MaxSp;
-            Sp = enemy.Sp;
-            Attack = enemy.Attack;
-            Defense = enemy.Defense;
-            Special = enemy.Special;
-            Speed = enemy.Speed;
-            Exp = enemy.Exp;
-
             skills = enemy.skills;
+            ScaleToLevel(enemy.Level, Level);
 
             //Normal attack should come last
             skills.Add(SkillManager.Attack);
+
 
             if (ai != null)
                 decideTurnAction = ai;
             else
                 decideTurnAction = () => { return DecideTurnAction(); };
+        }
+
+        void ScaleToLevel(int oldLv, int newLv)
+        {
+            int dif = newLv - oldLv;
+            if (dif < 0)
+                dif = -(int)MathF.Sqrt(MathF.Abs(dif * .5f));
+
+            if (dif == 0)
+                return;
+
+            MaxHp += (int)(dif * MaxHp * .5f).Clamp(-MaxHp, float.MaxValue);
+            Hp = MaxHp;
+            MaxSp += (int)(dif * MaxSp * .5f).Clamp(-MaxSp, float.MaxValue);
+            Sp = MaxSp;
+            Attack += (int)(dif * Attack * .5f).Clamp(-Attack, float.MaxValue);
+            Defense += (int)(dif * Defense * .5f).Clamp(-Defense, float.MaxValue);
+            Special += (int)(dif * Special * .5f).Clamp(-Special, float.MaxValue);
+            Defense += (int)(dif * Defense * .5f).Clamp(-Defense, float.MaxValue);
+            Speed += (int)(dif * Speed * .2f).Clamp(-Speed, float.MaxValue);
+            Exp += (int)(dif * Exp * .2f).Clamp(4, float.MaxValue);
         }
 
         SkillBase DecideTurnAction()

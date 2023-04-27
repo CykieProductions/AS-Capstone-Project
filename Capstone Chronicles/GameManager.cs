@@ -18,6 +18,9 @@ namespace Capstone_Chronicles
         public static State gameState;
         public static Scene CurrentScene { get; private set; }
         public static Scene PreviousScene { get; private set; }
+
+        public static event Action<Scene, Scene>? SceneChanged;
+
         /// <summary> The GUI element currently receiving input </summary>
         public static InteractiveGUI? ActiveInteractiveElement { get; set; }
 
@@ -25,6 +28,8 @@ namespace Capstone_Chronicles
         {
             PreviousScene = CurrentScene;
             CurrentScene = scene;
+
+            SceneChanged?.Invoke(CurrentScene, PreviousScene);
 
             PreviousScene?.Exit();
             CurrentScene?.Start();

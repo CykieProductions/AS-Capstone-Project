@@ -58,6 +58,20 @@ namespace Capstone_Chronicles
                 Speed = speed;
                 Exp = exp;
             }
+            //From Actor constructor
+            public StatsStruct(Actor actor, int lv = 0)
+            {
+                Level =     lv <= 0 ? actor.Level : lv;
+                MaxHp =     actor.MaxHp;
+                Hp =        actor.Hp;
+                MaxSp =     actor.MaxSp;
+                Sp =        actor.Sp;
+                Attack =    actor.Attack;
+                Defense =   actor.Defense;
+                Special =   actor.Special;
+                Speed =     actor.Speed;
+                Exp =       actor.Exp;
+            }
 
         }
     }

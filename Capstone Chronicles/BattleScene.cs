@@ -12,7 +12,8 @@ namespace Capstone_Chronicles
             IN_COMBAT, WIN, LOSE, FLED
         }
 
-        static int totalExp = 0;
+        private int totalExp = 0;
+        private bool canBeEscaped = true;
 
         static Hero? curHero = HeroManager.Party[0];
 
@@ -83,34 +84,38 @@ namespace Capstone_Chronicles
             new()
             {
 
-            }, wrap: true, remember: true, inRowLimit: 3);
+            }, wrap: true, remember: true, inRowLimit: 4);
         static Menu targetMenu = TargetMenuTemplate.ShallowCopy();
 
         #endregion
 
 
-        public BattleScene(params Enemy[] inEnemies) 
+        public BattleScene(Encounter encounter) 
             : base(Array.Empty<GUIComponent>())
         {
-            enemies = inEnemies.ToList();
+            enemies = encounter.GetEnemies();
+            canBeEscaped = encounter.CanBeEscaped;
 
             //! Rename duplicate enemies
-            for (int i = 0; i < enemies.Count; i++)
+            HashSet<string> usedNames = new();
+            for (int u = 0; u < enemies.Count; u++)
             {
-                if (i == enemies.Count - 1)//stop if this is the last/only enemy
+                if (enemies.Count <= 1)
                     break;
-                for (int j = i + 1; j < enemies.Count; j++)
-                {
-                    if (enemies[j].Name == enemies[i].Name.Replace(" (1)", ""))//Duplicate names where found
-                    {
-                        if (!enemies[i].Name.Contains(" ("))//If no suffix on previous, then mark it as the first enemy with this name
-                            enemies[i].Name += $" (1)";
-                        enemies[j].Name += $" ({j + 1})";
 
-                        //Now number this enemy appropriately
-                        //var split = enemies[i].Name.Split(' ');
-                        //enemies[j].Name = enemies[i].Name.Replace(split[split.Length - 1], $"({j + 1})");
-                    }
+                //Once the name is found once, every enemy with that name is handled
+                if (usedNames.Contains(enemies[u].Name.Split(" (")[0]))
+                    continue;
+
+                //A new name was found, now check if more enemies have it
+                usedNames.Add(enemies[u].Name);
+                var dupes = enemies.FindAll(x => x.Name == enemies[u].Name);
+
+                if (dupes.Count <= 1) continue;
+
+                for (int i = 0; i < dupes.Count; i++)
+                {
+                    dupes[i].Name += $" ({i + 1})";
                 }
             }
 
@@ -128,7 +133,7 @@ namespace Capstone_Chronicles
         }
 
 
-        private static void RunBattle()
+        private void RunBattle()
         {
             RoundResult result;
             while (RunRound(out result));
@@ -142,6 +147,7 @@ namespace Capstone_Chronicles
             else if (result == RoundResult.FLED)
                 return;
 
+            Area.Current.ModifyProgress(1);
             foreach (var hero in HeroManager.Party)
             {
                 if (hero.Hp == 0)
@@ -156,7 +162,7 @@ namespace Capstone_Chronicles
         /// Runs battle logic for one round
         /// </summary>
         /// <returns> True if the battle is still going; False if the battle is over </returns>
-        private static bool RunRound(out RoundResult roundResult)
+        private bool RunRound(out RoundResult roundResult)
         {
             roundResult = RoundResult.IN_COMBAT;
             Current.ToggleInfoLabels(false);
@@ -177,7 +183,7 @@ namespace Capstone_Chronicles
 
                 curHero = HeroManager.Party[i];
 
-                if (curHero != heroes[0])
+                if (curHero != heroes[0] || !canBeEscaped)
                 {
                     actionMenu.Remove("Flee", false);
                     CanGoBack = true;
@@ -192,9 +198,14 @@ namespace Capstone_Chronicles
                 //Back to Previous Active Hero
                 if (goBack)
                 {
-                    do
+                    var og = i;
+                    i--;
+                    while (HeroManager.Party[i].Hp <= 0 || HeroManager.Party[i].nextAction == SkillManager.Skip_Turn)
+                    {
                         i--;
-                    while (HeroManager.Party[i].Hp <= 0);
+                        if (i < 0)
+                            i = og;
+                    }
 
                     goto HeroDecisionStart;
                 }
@@ -320,6 +331,9 @@ namespace Capstone_Chronicles
                     }
                     else //no actors left
                         endBattle = true;
+
+                    for (int i = 0; i < curActor.statusEffects.Count; i++)
+                        curActor.statusEffects[i]?.TryRemoveEffect(curActor);
                 }
 
                 //Trigger Effect before turn
@@ -335,7 +349,7 @@ namespace Capstone_Chronicles
 
                         curActor.nextAction = null;
                     }
-                    curActor.statusEffects[i]?.TryRemoveEffect(curActor);
+                    //Try to get rid of it at the end of the turn
                 }
 
                 //Auto Skip if null

@@ -92,20 +92,20 @@ namespace Capstone_Chronicles
 
             //Calculate a base increase and then randomly skew it a bit
             float amount = CalculateBaseIncrease(info.curve, info.stat, info.scalar);
-            float skew;//for debugging
+            float skew;
 
             if (info.scalar != 0 && statType != Actor.StatType.Exp)
             {
-                skew = RNG.RandomInt(-20, 20) / 10f;
-                amount = MathF.Abs(MathF.Round(amount + skew));
+                skew = RNG.RandomInt(-60, 60) / 100f;
+                amount = MathF.Abs(MathF.Round(amount + amount.Clamp(1, 6) * skew));
             }
 
-            info.stat += (int)amount;
+            //info.stat += (int)amount;
 
             if (showText && amount > 0)
                 Scene.print($"{self.Name}'s {statName} increased by {(int)amount}");
 
-            return info.stat;
+            return (int)amount;
         }
 
         public float CalculateBaseIncrease(GrowthCurve growthType, int stat, float scalar)

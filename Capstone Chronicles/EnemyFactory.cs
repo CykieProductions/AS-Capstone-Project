@@ -15,22 +15,31 @@ namespace Capstone_Chronicles
 
         public static Enemy Growfa { get =>
                 new("Growfa", ElementManager.PLANT, new Actor.StatsStruct(level: 1, maxHp: 12, maxSp: 30,
-                    attack: 3, defense: 0, special: 3, speed: 1, exp: 3), new()
+                    attack: 3, defense: 0, special: 3, speed: 1, exp: 4), new()
                     {
                         SkillManager.Vine_Whip,
                         SkillManager.Vine_Whip,//Duped for higher chances
                         SkillManager.Waste_Jumping,
                     }); }
+        public static Enemy Caprid { get =>
+                new("Caprid", ElementManager.PLANT, new Actor.StatsStruct(level: 1, maxHp: 8, maxSp: 30,
+                    attack: 2, defense: 150, special: 2, speed: 0, exp: 15), new()
+                    {
+                        SkillManager.Poison_Powder,
+                        SkillManager.Bite,
+                        SkillManager.Bite,
+                        SkillManager.Waste_Stare,
+                    }); }
         public static Enemy Skoka { get =>
                 new("Skoka", ElementManager.NORMAL, new Actor.StatsStruct(level: 1, maxHp: 16, maxSp: 30,
-                    attack: 4, defense: 0, special: 1, speed: 3, exp: 5), new()
+                    attack: 4, defense: 0, special: 1, speed: 3, exp: 8), new()
                     {
                         SkillManager.Water_Pulse,
                         SkillManager.Attack,
                         SkillManager.Waste_Stare,
                     }); }
         public static Enemy ElderSkoka { get =>
-                new("Elder Skoka", ElementManager.NORMAL, new Actor.StatsStruct(level: 5, maxHp: 40, maxSp: 120,
+                new("Elder Skoka", ElementManager.NORMAL, new Actor.StatsStruct(level: 5, maxHp: 100, maxSp: 120,
                     attack: 3, defense: 0, special: 2, speed: 1, exp: 32), new()
                     {
                         SkillManager.Leaf_Storm,
@@ -43,18 +52,41 @@ namespace Capstone_Chronicles
                     }); }
 
         public static Enemy Flarix { get =>
-                new("Flarix", ElementManager.FIRE, new Actor.StatsStruct(level: 2, maxHp: 20, maxSp: 12,
-                    attack: 4, defense: 0, special: 5, speed: 1, exp: 8), new()
+                new("Flarix", ElementManager.FIRE, new Actor.StatsStruct(level: 2, maxHp: 40, maxSp: 12,
+                    attack: 8, defense: 0, special: 5, speed: 1, exp: 20), new()
                     {
-                        SkillManager.Fireball,
+                        SkillManager.L1H1_Fireball,
                         SkillManager.Waste_Stare,
                     }); }
         public static Enemy Plugry { get =>
-                new("Plugry", ElementManager.ELECTRIC, new Actor.StatsStruct(level: 2, maxHp: 20, maxSp: 20,
-                    attack: 3, defense: 0, special: 8, speed: 2, exp: 10), new()
+                new("Plugry", ElementManager.ELECTRIC, new Actor.StatsStruct(level: 2, maxHp: 30, maxSp: 20,
+                    attack: 6, defense: 0, special: 8, speed: 2, exp: 28), new()
                     {
-                        SkillManager.Charge_Bolt,
+                        SkillManager.L1H1_Charge_Bolt,
                         SkillManager.Waste_Short_Circut
+                    }); }
+        public static Enemy Epho { get =>
+                new("Epho", ElementManager.AIR, new Actor.StatsStruct(level: 10, maxHp: 140, maxSp: 20,
+                    attack: 14, defense: 5, special: 18, speed: 8, exp: 50), new()
+                    {
+                        SkillManager.L1Ha_Electro_Wave,
+                        SkillManager.Air_Cannon,
+                        SkillManager.Air_Cannon,
+                        SkillManager.Waste_Stare
+                    }); }
+        public static Enemy Terradon { get =>
+                new("Terradon", ElementManager.GROUND, new Actor.StatsStruct(level: 10, maxHp: 160, maxSp: 20,
+                    attack: 28, defense: 25, special: 12, speed: 2, exp: 66), new()
+                    {
+                        SkillManager.Pebble_Blast,
+                        SkillManager.Pebble_Blast,
+                        SkillManager.Pebble_Blast,
+                        SkillManager.Rock_Slide,
+                        SkillManager.Geo_Shift,
+                        SkillManager.Bite,
+                        SkillManager.Bite,
+                        SkillManager.Bite,
+                        SkillManager.Waste_Roar
                     }); }
 
         #region BOSSES
@@ -63,11 +95,6 @@ namespace Capstone_Chronicles
             get
             {
                 //Custom moves
-                var biteAction = new Skill<Actor, Actor>("Bite", (user, target) => {
-                    Scene.print($"{user.Name} bit {target.Name}");
-                    target.ModifyHealth(-SkillManager.BasicAttackFormula(user, 2));
-                }, elmt: ElementManager.NORMAL);
-
                 var diveAction = new Skill<Actor>("Dive", (user) =>
                 {
                     Scene.print($"{user.Name} dove underwater");
@@ -114,8 +141,8 @@ namespace Capstone_Chronicles
                     attack: 5, defense: 1, special: 9, speed: 1, exp: 78), new()
                     {
                         SkillManager.Geo_Shift,
-                        biteAction,
-                        biteAction,
+                        SkillManager.Bite,
+                        SkillManager.Bite,
                         SkillManager.Water_Pulse,
                         SkillManager.Water_Pulse,
                         SkillManager.Poison_Cloud,
@@ -133,12 +160,11 @@ namespace Capstone_Chronicles
                         {
                             if (skill == SkillManager.Attack && RNG.Chance(1f / 1f))//Don't normal attack
                                 skillPool.Remove(SkillManager.Attack);
-                            else if (skill.Cost > leviac.Sp && RNG.Chance(1f / 2))//Leaves a small chance to use a skill that costs too much
+                            else if (skill.Cost > leviac.Sp && RNG.Chance(1f / 4))//Leaves a small chance to use a skill that costs too much
                                 skillPool.Remove(skill);
                         }
 
                         var randInt = RNG.RandomInt(0, skillPool.Count - 1);
-                        //don't leave an increased chance for a basic attack on this enemy
 
                         return skillPool[randInt];
                     });

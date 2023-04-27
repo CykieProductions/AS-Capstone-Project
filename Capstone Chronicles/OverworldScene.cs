@@ -1,6 +1,8 @@
 ﻿using Capstone_Chronicles.GUI;
+using Pastel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ namespace Capstone_Chronicles
     public class OverworldScene : Scene
     {
 
+        public Area AreaInfo { get; set; }
 
         static Hero curHero = HeroManager.Party[0];
 
@@ -27,18 +30,36 @@ namespace Capstone_Chronicles
                         hero.Name, hero.Hp, hero.MaxHp,
                         hero.Sp, hero.MaxSp);
                 }
+
+                actionMenu.Prompt.SetDynamicText($"{actionMenu.Prompt.Text}\n\n" +
+                    $"Progress through {Area.Current.Name}: {Area.Current.Progress}/{Area.Current.Length}\n");
+
+                //CanGoBack = false;
             }),
             new()
             {
                 new Button("Proceed", menu =>
                 {
-                    GameManager.ChangeScene(SceneFactory.GetBattleScene());
+                    Area area = ((OverworldScene)Current).AreaInfo;
+
+                    if (!area.TryGetFixedEncounter(out Encounter encounter))
+                    {
+                        encounter = area.GetRandomEncounter();
+                    }
+
+                    GameManager.ChangeScene(SceneFactory.GetBattleScene(encounter));
                 }),
                 new Button("Skills", menu =>
                 {
-                    curHero = RunTargetMenu();
+                Start:
+                    curHero = RunTargetMenu(actionMenu);
+                    if (curHero == null) return;
+
                     if (curHero.skills.Count > 0)
-                        RunSkillMenu();
+                    {
+                        if (!RunSkillMenu())
+                            goto Start;
+                    }
                     else
                     {
                         menu.closeAfterConfirm = false;
@@ -46,8 +67,10 @@ namespace Capstone_Chronicles
                 }),
                 new Button("Stats", menu =>
                 {
-                    curHero = RunTargetMenu();
-                    DisplayStats(curHero);
+                    curHero = RunTargetMenu(actionMenu);
+
+                    if (curHero!= null)
+                        DisplayStats(curHero);
                 }),
                 new Button("Save", menu =>
                 {
@@ -71,9 +94,11 @@ namespace Capstone_Chronicles
             });
         #endregion
 
-        public OverworldScene(Action? startAction, Action? exitAction, GUIComponent[] inElements) 
-            : base(startAction, exitAction, inElements)
+        public OverworldScene(Area area, Action? startAction = null, Action? exitAction = null, GUIComponent[]? inElements = null) 
+            : base(startAction, exitAction, inElements ?? Array.Empty<GUIComponent>())
         {
+            AreaInfo = area;
+
             AddGUIElement(actionMenu, false);
             AddGUIElement(targetMenu, false);
             AddGUIElement(skillMenu, false);
@@ -86,35 +111,35 @@ namespace Capstone_Chronicles
             RunPauseLogic();
         }
 
-        //todo decide
-        static void RunNavagationLogic()
-        {
-            while (Program.GameIsRunning)
-            {
-                if (Input.GetKeyDown(Input.PauseKey))
-                {
-                    //actionMenu.SetActive(false, false);
-                    RunPauseLogic();
-                }
-            }
-        }
-
         static void RunPauseLogic()
         {
             while (Program.GameIsRunning)
             {
-                /*if (Input.GetKeyDown(Input.PauseKey))
+#if DEBUG
+                //if (Console.KeyAvailable)
                 {
-                    actionMenu.SetActive(false, false);
-                    RunNavagationLogic();
-                }*/
-
+                    var ki = Console.ReadKey();
+                    if (int.TryParse(ki.KeyChar.ToString(), out int num))
+                    {
+                        ki = Console.ReadKey();
+                        if (ki.Key == ConsoleKey.OemPlus || ki.Key == ConsoleKey.Add)
+                            Area.Current.ModifyProgress(num);
+                        else if (ki.Key == ConsoleKey.OemMinus || ki.Key == ConsoleKey.Subtract)
+                            Area.Current.ModifyProgress(-num);
+                        else
+                            Area.Current.ModifyProgress(num, true);
+                    }
+                }
+#endif
                 actionMenu.SetActive(true);
             }
         }
 
-        static Hero RunTargetMenu()
+        static Hero? RunTargetMenu(Menu? previous)
         {
+            if (previous != null)
+                CanGoBack = true;
+
             Hero target = HeroManager.Party[0];
 
             targetMenu.ClearOptions(false);
@@ -128,6 +153,18 @@ namespace Capstone_Chronicles
 
             GameManager.ActiveInteractiveElement?.SetActive(false);
             targetMenu.SetActive(true);
+
+            if (goBack)
+            {
+                targetMenu.SetActive(false);
+
+                if (previous == skillMenu)
+                    RunSkillMenu();
+                else
+                    previous?.SetActive(true);
+
+                return null;
+            }
 
             return target;
         }
@@ -146,36 +183,37 @@ namespace Capstone_Chronicles
             }
 
             if (effectsText != "")
-                effectsText = "\n" + effectsText;
+                effectsText = "\nCondition: " + effectsText;
 
             print(
 $@"    {curHero.Name}
+Level {curHero.Level}
 Element: {curHero.Element.Name}
-", true, 0); 
+".Pastel(ConsoleColor.Cyan), true, 0);
 
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            print(effectsText, true, 0);
-            Console.ResetColor();
+            print(effectsText.Pastel(ConsoleColor.Magenta), true, 0);
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
             print(
 $@"
-HP: {curHero.Hp}/{curHero.MaxHp}
-SP: {curHero.Sp}/{curHero.MaxSp}
+{$"HP: {curHero.Hp}/{curHero.MaxHp}".Pastel(curHero.Hp == 0 ? Color.Red : Color.LightGreen)}
+{$"SP: {curHero.Sp}/{curHero.MaxSp}".Pastel(curHero.Sp == 0 ? Color.Red : Color.LightBlue)}
 
 Attack: {curHero.Attack}
 Defense: {curHero.Defense}
 Special: {curHero.Special}
 Speed: {curHero.Speed}
-Exp to Next Level: {curHero.Exp}/{curHero.NeededExp}",
+
+{$"Exp to Next Level: {curHero.Exp}/{curHero.NeededExp}".Pastel(Color.Gold)}",
             true, -1);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
 
             Current.ToggleInfoLabels(false);
         }
 
-        static void RunSkillMenu()
+        static bool RunSkillMenu()
         {
+            CanGoBack = true;
+
             skillMenu.ClearOptions(false);
             foreach (var skill in curHero.skills)
             {
@@ -190,7 +228,9 @@ Exp to Next Level: {curHero.Exp}/{curHero.NeededExp}",
 
                     if (skill.targetType == SkillBase.TargetGroup.ONE_ALLY)
                     {
-                        (skill as Skill<Actor, Actor>).Use(curHero, RunTargetMenu());
+                        var target = RunTargetMenu(skillMenu);
+                        if (target != null)
+                            (skill as Skill<Actor, Actor>).Use(curHero, target);
                     }
                     else if (skill.targetType == SkillBase.TargetGroup.ALL_ALLIES)
                     {
@@ -205,7 +245,15 @@ Exp to Next Level: {curHero.Exp}/{curHero.NeededExp}",
             TryUpdateSkillDescription(skillMenu);//Sets bottom text to the correct value immediately
             skillInfoLabel.SetActive(true);
             skillMenu.SetActive(true);
+
+            if (goBack)
+            {
+                skillMenu.SetActive(false);
+                return false;
+            }
+
             Current.ToggleInfoLabels(false);
+            return true;
         }
     }
 }

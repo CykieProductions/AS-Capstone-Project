@@ -35,22 +35,23 @@ namespace Capstone_Chronicles
         //
 
         public static Skill<Actor, Actor> Attack { get; private set; }
+        public static Skill<Actor, Actor> Bite { get; private set; }
         public static Skill<Actor> Guard { get; private set; }
         public static Skill<Actor, Actor> Scan_Lash { get; private set; }
 
         //Fire moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Fireball { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Fireball { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Flame_Burst { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Flame_Burst { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Eruption { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Eruption { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Flare_Fall { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Flare_Fall { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Blazing_Vortex { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Blazing_Vortex { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Supernova { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Supernova { get; private set; }
 
         //Water moves
         /// <summary>Level 1 | Hit one</summary>
@@ -59,7 +60,6 @@ namespace Capstone_Chronicles
         public static Skill<Actor, Actor> Water_Jet { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
         public static Skill<Actor, Actor> Hydo_Cannon { get; private set; }
-        //public static Skill<Actor, Actor> Torpedo { get; private set; }//Physical
         /// <summary>Level 1 | Hit all</summary>
         public static Skill<Actor, List<Actor>> Waterfall { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
@@ -109,19 +109,19 @@ namespace Capstone_Chronicles
         /// <summary>Level 3 | Hit all</summary>
         public static Skill<Actor, List<Actor>> Hurricane { get; private set; }
 
-        //Electric moves
+        //! Electric Moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Charge_Bolt { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Charge_Bolt { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Taser_Grip { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Taser_Grip { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Ion_Overload { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Ion_Overload { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Electro_Wave { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Electro_Wave { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Tesla_Cannon { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Tesla_Cannon { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Gigawatt_Dischage { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Gigawatt_Dischage { get; private set; }
 
         //Healing
         public static Skill<Actor, Actor> Healing_Powder { get; private set; }
@@ -415,15 +415,20 @@ namespace Capstone_Chronicles
             Attack = new Skill<Actor, Actor>("Attack", (user, target) =>
             {
                 print($"{user.Name} attacked {target.Name}");
-                //user.Attack(target);
                 target.ModifyHealth(-BasicAttackFormula(user, 1), Attack);
             }
             , 0, SkillBase.TargetGroup.ONE_OPPONENT);
 
-            #region FIRE
-            Fireball = new Skill<Actor, Actor>("Fireball", (user, target) =>
+            Bite = new Skill<Actor, Actor>("Bite", (user, target) => 
             {
-                var curSkill = Fireball;
+                print($"{user.Name} bit {target.Name}");
+                target.ModifyHealth(-BasicAttackFormula(user, 2));
+            }, elmt: ElementManager.NORMAL);
+
+            #region FIRE
+            L1H1_Fireball = new Skill<Actor, Actor>("Fireball", (user, target) =>
+            {
+                var curSkill = L1H1_Fireball;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} shot out a fireball");
@@ -442,9 +447,9 @@ namespace Capstone_Chronicles
             }
             , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
-            Flame_Burst = new Skill<Actor, Actor>("Flame Burst", (user, target) =>
+            L2H1_Flame_Burst = new Skill<Actor, Actor>("Flame Burst", (user, target) =>
             {
-                var curSkill = Flame_Burst;
+                var curSkill = L2H1_Flame_Burst;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -463,9 +468,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
-            Eruption = new Skill<Actor, Actor>("Eruption", (user, target) =>
+            L3H1_Eruption = new Skill<Actor, Actor>("Eruption", (user, target) =>
             {
-                var curSkill = Eruption;
+                var curSkill = L3H1_Eruption;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -484,9 +489,9 @@ namespace Capstone_Chronicles
             }
             , 24, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.FIRE);
 
-            Flare_Fall = new Skill<Actor, List<Actor>>("Flare Fall", (user, targets) =>
+            L1Ha_Flare_Fall = new Skill<Actor, List<Actor>>("Flare Fall", (user, targets) =>
             {
-                var curSkill = Flare_Fall;
+                var curSkill = L1Ha_Flare_Fall;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -509,9 +514,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.FIRE);
 
-            Blazing_Vortex = new Skill<Actor, List<Actor>>("Blazing Vortex", (user, targets) =>
+            L2Ha_Blazing_Vortex = new Skill<Actor, List<Actor>>("Blazing Vortex", (user, targets) =>
             {
-                var curSkill = Blazing_Vortex;
+                var curSkill = L2Ha_Blazing_Vortex;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -533,9 +538,9 @@ namespace Capstone_Chronicles
             }
             , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.FIRE);
 
-            Supernova = new Skill<Actor, List<Actor>>("Supernova", (user, targets) =>
+            L3Ha_Supernova = new Skill<Actor, List<Actor>>("Supernova", (user, targets) =>
             {
-                var curSkill = Supernova;
+                var curSkill = L3Ha_Supernova;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -807,6 +812,8 @@ namespace Capstone_Chronicles
                     int total = 0;
                     for (int i = 0; i < 6; i++)//can hit 6 times
                     {
+                        if (target.Hp <= 0) break;
+
                         int amount = (int)(BasicAttackFormula(user, 1) / 3f).Clamp(2, int.MaxValue);
                         if (i <= 1)//2 hits guaranteed
                         {
@@ -877,6 +884,8 @@ namespace Capstone_Chronicles
                         int total = 0;
                         for (int i = 0; i < 4; i++)//can hit 4 times
                         {
+                            if (target.Hp <= 0) break;
+
                             int amount = (int)(BasicAttackFormula(user, 1) / 2f).Clamp(2, int.MaxValue);
                             if (i <= 1)//2 hits guaranteed
                             {
@@ -1059,9 +1068,9 @@ namespace Capstone_Chronicles
             #endregion
 
             #region ELECTRIC
-            Charge_Bolt = new Skill<Actor, Actor>("Charge Bolt", (user, target) =>
+            L1H1_Charge_Bolt = new Skill<Actor, Actor>("Charge Bolt", (user, target) =>
             {
-                var curSkill = Charge_Bolt;
+                var curSkill = L1H1_Charge_Bolt;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1080,9 +1089,9 @@ namespace Capstone_Chronicles
             }
             , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
-            Taser_Grip = new Skill<Actor, Actor>("Taser Grip", (user, target) =>
+            L2H1_Taser_Grip = new Skill<Actor, Actor>("Taser Grip", (user, target) =>
             {
-                var curSkill = Taser_Grip;
+                var curSkill = L2H1_Taser_Grip;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1101,9 +1110,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
-            Ion_Overload = new Skill<Actor, Actor>("Ion Overload", (user, target) =>
+            L3H1_Ion_Overload = new Skill<Actor, Actor>("Ion Overload", (user, target) =>
             {
-                var curSkill = Ion_Overload;
+                var curSkill = L3H1_Ion_Overload;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1122,9 +1131,9 @@ namespace Capstone_Chronicles
             }
             , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.ELECTRIC);
 
-            Electro_Wave = new Skill<Actor, List<Actor>>("Electro Wave", (user, targets) =>
+            L1Ha_Electro_Wave = new Skill<Actor, List<Actor>>("Electro Wave", (user, targets) =>
             {
-                var curSkill = Electro_Wave;
+                var curSkill = L1Ha_Electro_Wave;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1147,9 +1156,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.ELECTRIC);
 
-            Tesla_Cannon = new Skill<Actor, List<Actor>>("Tesla Cannon", (user, targets) =>
+            L2Ha_Tesla_Cannon = new Skill<Actor, List<Actor>>("Tesla Cannon", (user, targets) =>
             {
-                var curSkill = Tesla_Cannon;
+                var curSkill = L2Ha_Tesla_Cannon;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1171,9 +1180,9 @@ namespace Capstone_Chronicles
             }
             , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.ELECTRIC);
 
-            Gigawatt_Dischage = new Skill<Actor, List<Actor>>("Gigawatt_Dischage", (user, targets) =>
+            L3Ha_Gigawatt_Dischage = new Skill<Actor, List<Actor>>("Gigawatt_Dischage", (user, targets) =>
             {
-                var curSkill = Gigawatt_Dischage;
+                var curSkill = L3Ha_Gigawatt_Dischage;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");

@@ -88,11 +88,13 @@ namespace Capstone_Chronicles.GUI
             {
                 Text = string.Format(format, data);
             }
-            else //Set the text normally can clear out the dynamics
-            {
+            else
                 Text = format;
-                OnDynamicUpdate = null;
-            }
+            
+        }
+        public void ClearDynamics()
+        {
+            OnDynamicUpdate = null;
         }
 
         public override void Display()

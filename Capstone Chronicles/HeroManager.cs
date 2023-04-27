@@ -14,15 +14,15 @@ namespace Capstone_Chronicles
         static Hero InitPlayer()
         {
             var stats = new Actor.StatsStruct(level: 1, maxHp: 40, hp: 9999, maxSp: 9_16, sp: 9999,
-                attack: 5, defense: 0, special: 3, speed: 5, exp: 0);
+                attack: 5, defense: 0, special: 3, speed: 5, exp: 1000000);
             var growthInfo = new StatGrowth(
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1.5f),
                 _spInfo: (StatGrowth.GrowthCurve.Square, 1f),
-                _attackInfo: (StatGrowth.GrowthCurve.Square, .9f),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, 1f),
                 _defenseInfo: (StatGrowth.GrowthCurve.Linear, .1f),
                 _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
-                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
+                _expInfo: (StatGrowth.GrowthCurve.Linear, 0.6f)
                 );
 
             var skillDict = new Dictionary<int, SkillBase>()
@@ -37,7 +37,7 @@ namespace Capstone_Chronicles
                 [12] = SkillManager.Super_Healing_Powder,
                 [15] = SkillManager.Curing_Cloud,
 
-                [16] = SkillManager.Charge_Bolt,
+                [16] = SkillManager.L1H1_Charge_Bolt,
                 [17] = SkillManager.Air_Cannon,
                 [18] = SkillManager.Phoenix_Powder,
                 [20] = SkillManager.Sky_Crusher,
@@ -52,20 +52,22 @@ namespace Capstone_Chronicles
 
             var hero = new Hero("Cyclone", stats, growthInfo, skillDict);
 
-            //TODO remove
+#if DEBUG
             hero.skills = new()
             {
-                SkillManager.Wind_Slash,
-                SkillManager.Healing_Powder,
-                SkillManager.Curing_Powder,
+                SkillManager.Super_Healing_Powder,
                 SkillManager.Healing_Cloud,
+                SkillManager.Curing_Powder,
+                SkillManager.Curing_Cloud,
+                SkillManager.Phoenix_Powder,
                 SkillManager.Air_Cannon,
                 SkillManager.Sonic_Boom,
                 SkillManager.Slash_Storm,
                 SkillManager.Sky_Crusher,
                 SkillManager.Hurricane,
-                SkillManager.Taser_Grip
+                SkillManager.L2H1_Taser_Grip
             };
+#endif
 
             return hero;
         }
@@ -77,9 +79,9 @@ namespace Capstone_Chronicles
             var growthInfo = new StatGrowth(
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1.2f),
                 _spInfo: (StatGrowth.GrowthCurve.Square, .8f),
-                _attackInfo: (StatGrowth.GrowthCurve.Square, 1f),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, .8f),
                 _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
-                _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
+                _specialInfo: (StatGrowth.GrowthCurve.Log, 1f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0f),
                 _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
                 );
@@ -129,20 +131,20 @@ namespace Capstone_Chronicles
                 _spInfo: (StatGrowth.GrowthCurve.Log, 1),
                 _attackInfo: (StatGrowth.GrowthCurve.Square, 1),
                 _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
-                _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
                 _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.6f)
                 );
 
             var skillDict = new Dictionary<int, SkillBase>()
             {
-                [3] = SkillManager.Fireball,
+                [3] = SkillManager.L1H1_Fireball,
                 [7] = SkillManager.Healing_Powder,
-                [12] = SkillManager.Flare_Fall,
-                [16] = SkillManager.Flame_Burst,
-                [25] = SkillManager.Blazing_Vortex,
-                [34] = SkillManager.Eruption,
-                [42] = SkillManager.Supernova,
+                [12] = SkillManager.L1Ha_Flare_Fall,
+                [16] = SkillManager.L2H1_Flame_Burst,
+                [25] = SkillManager.L2Ha_Blazing_Vortex,
+                [34] = SkillManager.L3H1_Eruption,
+                [42] = SkillManager.L3Ha_Supernova,
             };
 
             var hero = new Hero("Foo", stats, growthInfo, skillDict, ElementManager.FIRE);
@@ -154,12 +156,12 @@ namespace Capstone_Chronicles
                 SkillManager.Ignite_Allies_Test,
                 SkillManager.Poison_Allies_Test,
                 SkillManager.Restore_SP_Allies_Test,
-                SkillManager.Fireball,
-                SkillManager.Flame_Burst,
-                SkillManager.Eruption,
-                SkillManager.Flare_Fall,
-                SkillManager.Blazing_Vortex,
-                SkillManager.Supernova
+                SkillManager.L1H1_Fireball,
+                SkillManager.L2H1_Flame_Burst,
+                SkillManager.L3H1_Eruption,
+                SkillManager.L1Ha_Flare_Fall,
+                SkillManager.L2Ha_Blazing_Vortex,
+                SkillManager.L3Ha_Supernova
             };//*/
             
             return hero;
@@ -172,11 +174,11 @@ namespace Capstone_Chronicles
             var growthInfo = new StatGrowth(
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1),
                 _spInfo: (StatGrowth.GrowthCurve.Square, 1),
-                _attackInfo: (StatGrowth.GrowthCurve.Linear, 1),
+                _attackInfo: (StatGrowth.GrowthCurve.Square, 1.2f),
                 _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
-                _specialInfo: (StatGrowth.GrowthCurve.Square, 1),
+                _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0),
-                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.5f)
+                _expInfo: (StatGrowth.GrowthCurve.SmoothExpo, 0.55f)
                 );
 
             var skillDict = new Dictionary<int, SkillBase>()
