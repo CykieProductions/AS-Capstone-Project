@@ -29,6 +29,9 @@ namespace Capstone_Chronicles.GUI
         /// </summary>
         protected virtual void RunInteraction ()
         {
+            if (!Program.GameIsRunning)
+                GameManager.ActiveInteractiveElement = null;
+
             if (GameManager.ActiveInteractiveElement == this)
                 return;
 
@@ -207,6 +210,9 @@ namespace Capstone_Chronicles.GUI
         {
             //Intercept any buffered inputs
             while (Console.KeyAvailable) Console.ReadKey(true);
+
+            if (!Program.GameIsRunning)
+                TryClose(true);
 
             Prompt?.Display();
 

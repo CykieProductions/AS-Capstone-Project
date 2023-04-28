@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Capstone_Chronicles.GUI;
+using static Capstone_Chronicles.BattleScene;
 
 namespace Capstone_Chronicles
 {
@@ -13,7 +14,6 @@ namespace Capstone_Chronicles
         }
 
         private int totalExp = 0;
-        private bool canBeEscaped = true;
 
         static Hero? curHero = HeroManager.Party[0];
 
@@ -89,12 +89,13 @@ namespace Capstone_Chronicles
 
         #endregion
 
+        private Encounter encounterData;
 
         public BattleScene(Encounter encounter) 
             : base(Array.Empty<GUIComponent>())
         {
             enemies = encounter.GetEnemies();
-            canBeEscaped = encounter.CanBeEscaped;
+            encounterData = encounter;
 
             //! Rename duplicate enemies
             HashSet<string> usedNames = new();
@@ -129,14 +130,27 @@ namespace Capstone_Chronicles
         {
             base.Start();
             RunBattle();
-            GameManager.ChangeScene(Previous);
+            if (Program.GameIsRunning)
+                GameManager.ChangeScene(Previous);
         }
 
 
         private void RunBattle()
         {
+            if (!Program.GameIsRunning)
+            {
+                GameManager.ChangeScene(SceneFactory.TitleScreen);
+                return;
+            }
+
             RoundResult result;
             while (RunRound(out result));
+
+            if (!Program.GameIsRunning)
+            {
+                GameManager.ChangeScene(SceneFactory.TitleScreen);
+                return;
+            }
 
             //! END OF BATTLE
             if (result == RoundResult.LOSE)
@@ -147,15 +161,28 @@ namespace Capstone_Chronicles
             else if (result == RoundResult.FLED)
                 return;
 
-            Area.Current.ModifyProgress(1);
+            encounterData.hasBeenBeat = true;
+            
             foreach (var hero in HeroManager.Party)
             {
                 if (hero.Hp == 0)
                     continue;
 
-                hero.Exp += totalExp;
-                hero.TryLevelUp();
+                float mult = 1;
+                if (hero.Level >= 12)
+                    mult = 3;
+                if (hero.Level >= 10)
+                    mult = 2;
+
+                hero.Exp += (int)(totalExp * mult);
+
+                if (totalExp > 1000)
+                    hero.TryLevelUp(false, true);
+                else
+                    hero.TryLevelUp();
             }
+
+            Area.Current.ModifyProgress(1);
         }
 
         /// <summary>
@@ -164,6 +191,12 @@ namespace Capstone_Chronicles
         /// <returns> True if the battle is still going; False if the battle is over </returns>
         private bool RunRound(out RoundResult roundResult)
         {
+            if (!Program.GameIsRunning)
+            {
+                roundResult = RoundResult.FLED;
+                return false;
+            }
+
             roundResult = RoundResult.IN_COMBAT;
             Current.ToggleInfoLabels(false);
             var heroes = new List<Hero>(HeroManager.Party);
@@ -183,7 +216,7 @@ namespace Capstone_Chronicles
 
                 curHero = HeroManager.Party[i];
 
-                if (curHero != heroes[0] || !canBeEscaped)
+                if (curHero != heroes[0] || !encounterData.CanBeEscaped)
                 {
                     actionMenu.Remove("Flee", false);
                     CanGoBack = true;
@@ -199,7 +232,7 @@ namespace Capstone_Chronicles
                 if (goBack)
                 {
                     var og = i;
-                    i--;
+                    i = (i - 1).Clamp(0, heroes.Count - 1);
                     while (HeroManager.Party[i].Hp <= 0 || HeroManager.Party[i].nextAction == SkillManager.Skip_Turn)
                     {
                         i--;
@@ -270,7 +303,7 @@ namespace Capstone_Chronicles
                 {
                     foreach (var e in enemies)
                     {
-                        targetMenu.Add(new Button($"{e.Name} | HP: {e.Hp}/{e.MaxHp}", (menu) =>
+                        targetMenu.Add(new Button($"{e.Name} | HP: {e.Hp}/{e.MaxHp} | [{e.Element.Name}]", (menu) =>
                         {
                             curHero.targets.Add(e);
                         }), false);
@@ -317,6 +350,8 @@ namespace Capstone_Chronicles
                 if (curActor.Hp <= 0)
                     continue;
 
+                string? originalActionName = curActor.nextAction?.Name;
+
                 List<Actor> targets = curActor.targets;
                 var activeEnemies = new List<Enemy>(enemies);
 
@@ -347,7 +382,11 @@ namespace Capstone_Chronicles
                         if (curActor is Enemy)
                             activeEnemies.Remove((Enemy)curActor);
 
-                        curActor.nextAction = null;
+                        //If a new action wasn't manually set
+                        if (originalActionName == curActor.nextAction?.Name)
+                            curActor.nextAction = null;
+                        else
+                            _ = 0;//Debug
                     }
                     //Try to get rid of it at the end of the turn
                 }

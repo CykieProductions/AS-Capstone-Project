@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
     public class Encounter
     {
+        public string? SaveKey { get; private set; }
+
         private List<Enemy> enemies;
         (int min, int max) amountRange = (0, 0);
         public bool CanBeEscaped { get; private set; } = true;
+        public bool CanBeRepeated { get; private set; } = true;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enemies"></param>
-        /// <param name="numOfEnemies"></param>
-        /// <param name="canBeEscaped"></param>
-        public Encounter(List<Enemy> enemies, (int min, int max)? numOfEnemies = null, bool canBeEscaped = true)
+        public bool hasBeenBeat = false;
+
+        public Encounter(List<Enemy> enemies, (int min, int max)? numOfEnemies = null, bool canBeEscaped = true,
+            bool canBeRepeated = true, string? saveKey = null)
         {
             this.enemies = enemies;
             CanBeEscaped = canBeEscaped;
+            CanBeRepeated = canBeRepeated;
 
             if (numOfEnemies != null)
                 amountRange = numOfEnemies.Value;
@@ -31,12 +33,27 @@ namespace Capstone_Chronicles
             //Min must be greater than 1
             amountRange.min.Clamp(1, amountRange.min);
             //If Max is less than 1 then the range will be intensionally ignored
+
+            SaveKey = saveKey;
+            if (!string.IsNullOrEmpty(SaveKey))
+            {
+                GameManager.BeginSave += Save;
+                GameManager.BeginSave += Load;
+            }
         }
 
-        public Encounter(bool canBeEscaped, params Enemy[] enemies)
+        public Encounter(bool canBeEscaped, bool canBeRepeated, string? saveKey, params Enemy[] enemies)
         {
             this.enemies = enemies.ToList();
             CanBeEscaped = canBeEscaped;
+            CanBeRepeated = canBeRepeated;
+
+            SaveKey = saveKey;
+            if (!string.IsNullOrEmpty(SaveKey))
+            {
+                GameManager.BeginSave += Save;
+                GameManager.BeginLoad += Load;
+            }
         }
 
         //! NOTICE: even though the list is a copy, the actual enemies themselves aren't. Issues may occur
@@ -66,6 +83,23 @@ namespace Capstone_Chronicles
             }
 
             return result;
+        }
+
+        void Save(int slot)
+        {
+            if (string.IsNullOrEmpty(SaveKey))
+                return;
+
+            SaveLoad.Save(hasBeenBeat, slot, SaveKey);
+        }
+
+        void Load(int slot)
+        {
+
+            if (string.IsNullOrEmpty(SaveKey))
+                return;
+
+            hasBeenBeat = SaveLoad.Load<bool>(slot, SaveKey);
         }
     }
 }

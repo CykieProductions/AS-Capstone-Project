@@ -31,6 +31,8 @@ namespace Capstone_Chronicles
 
         public Action? OnRenderComplete;
 
+        public static readonly Menu fileSelect = new("Which File?", new(), true, false, 4, inEnabled: false);
+
         //! Gameplay 
         protected static Label skillInfoLabel = new("");
 
@@ -57,11 +59,15 @@ namespace Capstone_Chronicles
         /// </summary>
         private void _BaseConstructor(GUIComponent[] inElements)
         {
+            if (!Program.GameIsRunning)
+                return;
+
             elements = inElements.ToList();
             for (int i = 0; i < infoLabels.Length; i++)
             {
                 AddGUIElement(infoLabels[i], false);
             }
+            AddGUIElement(fileSelect, false);
 
             for (int i = 0; i < elements.Count; i++)
             {
@@ -96,6 +102,9 @@ namespace Capstone_Chronicles
         public void Refresh()
         {
             Console.Clear();
+            if (!Program.GameIsRunning)
+                return;
+
             for (int i = 0; i < elements.Count; i++)
             {
                 if (elements[i].Enabled)
@@ -130,21 +139,59 @@ namespace Capstone_Chronicles
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
-        /// <param name="singleLine"></param>
-        /// <param name="delayAfter"></param>
-        public static void print<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
+        /// <param name="singleLine">Should I stay on the same line afterward</param>
+        /// <param name="delayAfter">Delay before moving on to the next line (-1 means manual)</param>
+        public static void print<T>(T message, bool singleLine = false, float delayAfter = 0.75f, bool instant = true)
         {
             if (EnablePrinting)
-                GameManager.CurrentScene?.Log(message, singleLine, delayAfter);
+                GameManager.CurrentScene?.Log(message, singleLine, delayAfter, instant ? 0 : 0.02f);
         }
 
-        protected virtual void Log<T>(T message, bool singleLine = false, float delayAfter = 0.75f)
+        protected virtual void Log<T>(T message, bool singleLine = false, float delayAfter = 0.75f, float textSpeed = 0)
         {
+            var text = message?.ToString();
             infoLabels[1].colors = (Console.ForegroundColor, Console.BackgroundColor);
-            infoLabels[1].Text += message?.ToString() + (singleLine ? "" : '\n');
 
-            if (infoLabels[0].Enabled || infoLabels[1].Enabled)
-                GameManager.CurrentScene.Refresh();
+            if (textSpeed <= 0)
+            {
+                infoLabels[1].Text += text + (singleLine ? "" : '\n');
+
+                if (infoLabels[0].Enabled || infoLabels[1].Enabled)
+                    GameManager.CurrentScene.Refresh();
+            }
+            else if (!string.IsNullOrEmpty(text)) //write out text char by char
+            {
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    infoLabels[1].Text += text[i];
+
+                    float wait = textSpeed;
+                    if (text[i] == '.' || text[i] == '!' || text[i] == '?')
+                        wait *= 50;
+
+                    if (Console.KeyAvailable)
+                    {
+                        //Skip to the end
+                        if (Console.ReadKey(true).Key == ConsoleKey.Enter)
+                        {
+                            infoLabels[1].Text += text[++i..] + (singleLine ? "" : '\n');
+                            GameManager.CurrentScene.Refresh();
+                            break;
+                        }
+                        else
+                        {
+                            wait = 0f;
+                        }
+                    }
+
+                    if (infoLabels[0].Enabled || infoLabels[1].Enabled)
+                        GameManager.CurrentScene.Refresh();
+                    if (wait > 0f)
+                        Thread.Sleep(TimeSpan.FromSeconds(wait));
+                }
+                infoLabels[1].Text += singleLine ? "" : '\n';
+            }
 
             if (!singleLine)
             {
@@ -152,6 +199,9 @@ namespace Capstone_Chronicles
                 infoLabels[0].Text = infoLabels[1].Text;
                 infoLabels[1].Text = "";
             }
+
+            if (!infoLabels[0].Enabled || !infoLabels[1].Enabled)
+                return;
 
             //Allow player to skip the delay between lines
             if (delayAfter > 0)

@@ -17,13 +17,13 @@ namespace Capstone_Chronicles
                 new("Growfa", ElementManager.PLANT, new Actor.StatsStruct(level: 1, maxHp: 12, maxSp: 30,
                     attack: 3, defense: 0, special: 3, speed: 1, exp: 4), new()
                     {
-                        SkillManager.Vine_Whip,
-                        SkillManager.Vine_Whip,//Duped for higher chances
+                        SkillManager.L1H1_Vine_Whip,
+                        SkillManager.L1H1_Vine_Whip,//Duped for higher chances
                         SkillManager.Waste_Jumping,
                     }); }
         public static Enemy Caprid { get =>
                 new("Caprid", ElementManager.PLANT, new Actor.StatsStruct(level: 1, maxHp: 8, maxSp: 30,
-                    attack: 2, defense: 150, special: 2, speed: 0, exp: 15), new()
+                    attack: 2, defense: 150, special: 2, speed: 0, exp: 10), new()
                     {
                         SkillManager.Poison_Powder,
                         SkillManager.Bite,
@@ -34,7 +34,7 @@ namespace Capstone_Chronicles
                 new("Skoka", ElementManager.NORMAL, new Actor.StatsStruct(level: 1, maxHp: 16, maxSp: 30,
                     attack: 4, defense: 0, special: 1, speed: 3, exp: 8), new()
                     {
-                        SkillManager.Water_Pulse,
+                        SkillManager.L1H1_Water_Pulse,
                         SkillManager.Attack,
                         SkillManager.Waste_Stare,
                     }); }
@@ -42,47 +42,47 @@ namespace Capstone_Chronicles
                 new("Elder Skoka", ElementManager.NORMAL, new Actor.StatsStruct(level: 5, maxHp: 100, maxSp: 120,
                     attack: 3, defense: 0, special: 2, speed: 1, exp: 32), new()
                     {
-                        SkillManager.Leaf_Storm,
-                        SkillManager.Leaf_Storm,
-                        SkillManager.Water_Pulse,
-                        SkillManager.Water_Pulse,
-                        SkillManager.Water_Pulse,
+                        SkillManager.L1Ha_Leaf_Storm,
+                        SkillManager.L1Ha_Leaf_Storm,
+                        SkillManager.L1H1_Water_Pulse,
+                        SkillManager.L1H1_Water_Pulse,
+                        SkillManager.L1H1_Water_Pulse,
                         SkillManager.Attack,
                         SkillManager.Waste_Stare
                     }); }
 
         public static Enemy Flarix { get =>
-                new("Flarix", ElementManager.FIRE, new Actor.StatsStruct(level: 2, maxHp: 40, maxSp: 12,
-                    attack: 8, defense: 0, special: 5, speed: 1, exp: 20), new()
+                new("Flarix", ElementManager.FIRE, new Actor.StatsStruct(level: 2, maxHp: 55, maxSp: 12,
+                    attack: 8, defense: 2, special: 5, speed: 7, exp: 20), new()
                     {
                         SkillManager.L1H1_Fireball,
                         SkillManager.Waste_Stare,
                     }); }
         public static Enemy Plugry { get =>
-                new("Plugry", ElementManager.ELECTRIC, new Actor.StatsStruct(level: 2, maxHp: 30, maxSp: 20,
-                    attack: 6, defense: 0, special: 8, speed: 2, exp: 28), new()
+                new("Plugry", ElementManager.ELECTRIC, new Actor.StatsStruct(level: 2, maxHp: 44, maxSp: 20,
+                    attack: 6, defense: 1, special: 8, speed: 5, exp: 28), new()
                     {
                         SkillManager.L1H1_Charge_Bolt,
                         SkillManager.Waste_Short_Circut
                     }); }
         public static Enemy Epho { get =>
                 new("Epho", ElementManager.AIR, new Actor.StatsStruct(level: 10, maxHp: 140, maxSp: 20,
-                    attack: 14, defense: 5, special: 18, speed: 8, exp: 50), new()
+                    attack: 14, defense: 5, special: 12, speed: 8, exp: 50), new()
                     {
                         SkillManager.L1Ha_Electro_Wave,
-                        SkillManager.Air_Cannon,
-                        SkillManager.Air_Cannon,
+                        SkillManager.L2H1_Air_Cannon,
+                        SkillManager.L2H1_Air_Cannon,
                         SkillManager.Waste_Stare
                     }); }
         public static Enemy Terradon { get =>
                 new("Terradon", ElementManager.GROUND, new Actor.StatsStruct(level: 10, maxHp: 160, maxSp: 20,
                     attack: 28, defense: 25, special: 12, speed: 2, exp: 66), new()
                     {
-                        SkillManager.Pebble_Blast,
-                        SkillManager.Pebble_Blast,
-                        SkillManager.Pebble_Blast,
-                        SkillManager.Rock_Slide,
-                        SkillManager.Geo_Shift,
+                        SkillManager.L1H1_Pebble_Blast,
+                        SkillManager.L1H1_Pebble_Blast,
+                        SkillManager.L1H1_Pebble_Blast,
+                        SkillManager.L1Ha_Rock_Slide,
+                        SkillManager.L2H1_Geo_Shift,
                         SkillManager.Bite,
                         SkillManager.Bite,
                         SkillManager.Bite,
@@ -131,20 +131,20 @@ namespace Capstone_Chronicles
                         List<Actor> targets = new(HeroManager.Party);
                         targets.RemoveAll(x => x.Hp <= 0);
 
-                        SkillManager.Hydo_Cannon.Use(user, targets[RNG.RandomInt(0, targets.Count - 1)]);
+                        SkillManager.L3H1_Hydo_Cannon.Use(user, targets[RNG.RandomInt(0, targets.Count - 1)]);
                         user.nextAction = SkillManager.Waste_Roar;
                     }).TryInflict(user, showInflictText: false, performImmediately: true);
 
                 });
 
-                Enemy leviac = new("Leviac", ElementManager.WATER, new Actor.StatsStruct(level: 10, maxHp: 360, maxSp: 80,
-                    attack: 5, defense: 1, special: 9, speed: 1, exp: 78), new()
+                Enemy leviac = new("Leviac", ElementManager.WATER, new Actor.StatsStruct(level: 10, maxHp: 390, maxSp: 80,
+                    attack: 5, defense: 1, special: 9, speed: 1, exp: 108), new()
                     {
-                        SkillManager.Geo_Shift,
+                        SkillManager.L2H1_Geo_Shift,
                         SkillManager.Bite,
                         SkillManager.Bite,
-                        SkillManager.Water_Pulse,
-                        SkillManager.Water_Pulse,
+                        SkillManager.L1H1_Water_Pulse,
+                        SkillManager.L1H1_Water_Pulse,
                         SkillManager.Poison_Cloud,
                         SkillManager.Waste_Roar,
                         diveAction,
@@ -162,6 +162,60 @@ namespace Capstone_Chronicles
                                 skillPool.Remove(SkillManager.Attack);
                             else if (skill.Cost > leviac.Sp && RNG.Chance(1f / 4))//Leaves a small chance to use a skill that costs too much
                                 skillPool.Remove(skill);
+                        }
+
+                        var randInt = RNG.RandomInt(0, skillPool.Count - 1);
+
+                        return skillPool[randInt];
+                    });
+            }
+        }
+        
+        public static Enemy Boss_Hology
+        {
+            get
+            {
+                var focusAction = new Skill<Actor>("Focus", (user) =>
+                {
+                    Scene.print($"{user.Name} is focused");
+
+                    if (RNG.Chance(2f / 3))
+                    {
+                        user.ModifyStamina(30);
+                    }
+                    else
+                    {
+                        user.nextAction = SkillManager.L3Ha_Gigawatt_Dischage;
+                    }
+                });
+
+                Enemy hology = new("Hology", ElementManager.NORMAL, new Actor.StatsStruct(level: 20, maxHp: 1500, maxSp: 100,
+                    attack: 24, defense: 50, special: 14, speed: 6, exp: 10000), new()
+                    {
+                        SkillManager.L2Ha_Spire_Wall,
+                        SkillManager.L2Ha_Sky_Crusher,
+                        SkillManager.L2H1_Flame_Burst,
+                        SkillManager.L3H1_Needle_Tomb,
+                        SkillManager.Confuse_Ray,
+                        focusAction,
+                    });
+
+                return new(hology, ai: () =>
+                    {
+                        var skillPool = hology.skills.ToList();//copy of the list
+
+                        //Program.curHeroes;//test
+                        foreach (var skill in hology.skills)
+                        {
+                            if (skill.Cost > hology.Sp && RNG.Chance(1f / 4))//Leaves a small chance to use a skill that costs too much
+                                skillPool.Remove(skill);
+
+                            if (HeroManager.Player.Hp < HeroManager.Player.MaxHp / 10
+                                && skill.targetType != SkillBase.TargetGroup.ALL_OPPONENTS)
+                            {
+                                skillPool.Remove(skill);
+                            }
+                                
                         }
 
                         var randInt = RNG.RandomInt(0, skillPool.Count - 1);

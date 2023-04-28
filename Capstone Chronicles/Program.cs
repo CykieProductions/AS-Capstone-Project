@@ -21,14 +21,11 @@ Start Date: 01/18/2023
 Links:
 ----
 Github:
+https://github.com/CykieProductions/AS-Capstone-Project
 
 Course Page: 
 https://hcc.instructure.com/courses/121338
 
-Bitmaps: 
-https://social.msdn.microsoft.com/Forums/en-US/6b7a7beb-0e18-484f-8e9c-5fad3482485d/uwp-bitmap-class-access-raw-pixel-data?forum=wpdevelop#:~:text=In%20C%23%2C%20use%20AsStream%20extension%20method%20to%20access,await%20Stream.CopyToAsync%28memoryStream%29%3B%20byte%5B%5D%20pixels%20%3D%20memoryStream.ToArray%28%29%3B%20%7D%20%7D
-Audio:
-https://stackoverflow.com/questions/34116886/how-to-play-background-music-in-a-c-sharp-console-application#:~:text=How%20to%20play%20background%20music%20in%20a%20C%23,Action%20to%20Content.%20...%203%20Use%20this%20code
 Menus in a Console App:
 https://www.youtube.com/watch?v=qAWhGEPMlS8
 ----------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +41,7 @@ namespace Capstone_Chronicles
     {
         public static string Name { get; private set; } = "Capstone Chronicles";
         public static bool GameIsRunning { get; private set; } = true;
-        public static Action? OnExit;
+        public static event Action? OnExit;
 
         static void Main(string[] args)
         {
@@ -72,7 +69,7 @@ namespace Capstone_Chronicles
         [Obsolete("This will only work in debug mode. Use a Label for actual text!", false)]
         public static void print<T>(T message, bool singleLine = false)
         {
-#if DEBUG
+#if DEBUG//fix
             if (GetCursorPosition().Left == 0)
                 Write("DEBUG: ");
             Write(message?.ToString() + (singleLine ? null : '\n'));
@@ -155,6 +152,20 @@ namespace Capstone_Chronicles
             return v;
         }
 
+        /// <summary>
+        /// Adds a new element to a list if it wasn't already present
+        /// </summary>
+        /// <returns>True if successfully added, otherwise False</returns>
+        public static bool AddIfUnique<T>(this IList<T> sequence, T obj)
+        {
+            if (!sequence.Contains(obj))
+            {
+                sequence.Add(obj);
+                return true;
+            }
+
+            return false;
+        }
         public static T GetRandomElement<T>(this IEnumerable<T> sequence)
         {
             return sequence.ElementAt(RNG.Rand.Next(0, sequence.Count()));
@@ -164,27 +175,6 @@ namespace Capstone_Chronicles
             sequence.Remove(sequence.ElementAt(RNG.Rand.Next(0, sequence.Count)));
         }
 
-        //https://stackoverflow.com/questions/56692/random-weighted-choice
-        ///<summary>NOT MY CODE</summary>
-        public static T RandomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, float> weightSelector)
-        {
-            float totalWeight = sequence.Sum(weightSelector);
-            // The weight we are after...
-            float itemWeightIndex = (float)new Random().NextDouble() * totalWeight;
-            float currentWeightIndex = 0;
-
-            foreach (var item in from weightedItem in sequence select new { Value = weightedItem, Weight = weightSelector(weightedItem) })
-            {
-                currentWeightIndex += item.Weight;
-
-                // If we've hit or passed the weight we are after for this item then it's the one we want....
-                if (currentWeightIndex >= itemWeightIndex)
-                    return item.Value;
-
-            }
-
-            return default(T);
-
-        }
+        
     }
 }

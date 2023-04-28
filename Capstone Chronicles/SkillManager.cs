@@ -26,6 +26,7 @@ namespace Capstone_Chronicles
 
         public static Skill<Actor, Actor> Poison_Powder { get; private set; }
         public static Skill<Actor, List<Actor>> Poison_Cloud { get; private set; }
+        public static Skill<Actor, Actor> Confuse_Ray { get; private set; }
 
         //Testing
         public static Skill<Actor, List<Actor>> Damage_Allies_Test { get; private set; }
@@ -55,59 +56,59 @@ namespace Capstone_Chronicles
 
         //Water moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Water_Pulse { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Water_Pulse { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Water_Jet { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Water_Jet { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Hydo_Cannon { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Hydo_Cannon { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Waterfall { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Waterfall { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Deluge { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Deluge { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Tsunami { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Tsunami { get; private set; }
 
         //Plant moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Vine_Whip { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Vine_Whip { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Leaf_Cutter { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Leaf_Cutter { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Needle_Tomb { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Needle_Tomb { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Leaf_Storm { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Leaf_Storm { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Root_Wave { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Root_Wave { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Thorn_Canopy { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Thorn_Canopy { get; private set; }
 
         //Ground moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Pebble_Blast { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Pebble_Blast { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Geo_Shift { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Geo_Shift { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Fissure { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Fissure { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Rock_Slide { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Rock_Slide { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Spire_Wall { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Spire_Wall { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Earthquake { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Earthquake { get; private set; }
 
         //Air moves
         /// <summary>Level 1 | Hit one</summary>
-        public static Skill<Actor, Actor> Wind_Slash { get; private set; }
+        public static Skill<Actor, Actor> L1H1_Wind_Slash { get; private set; }
         /// <summary>Level 2 | Hit one</summary>
-        public static Skill<Actor, Actor> Air_Cannon { get; private set; }
+        public static Skill<Actor, Actor> L2H1_Air_Cannon { get; private set; }
         /// <summary>Level 3 | Hit one</summary>
-        public static Skill<Actor, Actor> Sonic_Boom { get; private set; }
+        public static Skill<Actor, Actor> L3H1_Sonic_Boom { get; private set; }
         /// <summary>Level 1 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Slash_Storm { get; private set; }
+        public static Skill<Actor, List<Actor>> L1Ha_Slash_Storm { get; private set; }
         /// <summary>Level 2 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Sky_Crusher { get; private set; }
+        public static Skill<Actor, List<Actor>> L2Ha_Sky_Crusher { get; private set; }
         /// <summary>Level 3 | Hit all</summary>
-        public static Skill<Actor, List<Actor>> Hurricane { get; private set; }
+        public static Skill<Actor, List<Actor>> L3Ha_Hurricane { get; private set; }
 
         //! Electric Moves
         /// <summary>Level 1 | Hit one</summary>
@@ -382,7 +383,6 @@ namespace Capstone_Chronicles
                     OutOfSP(user.Name);
             }
             , 5, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
-
             Poison_Cloud = new Skill<Actor, List<Actor>>("Poison Cloud", (user, targets) =>
             {
                 var curSkill = Poison_Cloud;
@@ -409,6 +409,32 @@ namespace Capstone_Chronicles
                     OutOfSP(user.Name);
             }
             , 14, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT, SkillBase.ActionType.INFLICTING);
+
+            Confuse_Ray = new Skill<Actor, Actor>("Confuse Ray", (user, target) =>
+            {
+                var curSkill = Confuse_Ray;
+                if (user.Sp >= curSkill.Cost)
+                {
+                    print($"{user.Name} used {curSkill.Name}");
+
+                    if (RNG.Chance(1f / 3))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        StatusEffectManager.CONFUSED.TryInflict(target);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        print($"But it failed");
+                    }
+
+                    user.Sp -= curSkill.Cost;
+                }
+                else
+                    OutOfSP(user.Name);
+            }
+            , 12, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.OMNI, SkillBase.ActionType.INFLICTING);
+
             #endregion
 
             #region ATTACKS
@@ -458,7 +484,7 @@ namespace Capstone_Chronicles
                     int amount = SpecialAttackFormula(user, 2);
                     amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (amount < 0 && RNG.Chance(1f / 6))
+                    if (amount < 0 && RNG.Chance(1f / 4))
                         StatusEffectManager.FLAMING.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -479,7 +505,7 @@ namespace Capstone_Chronicles
                     int amount = SpecialAttackFormula(user, 3);
                     amount = target.ModifyHealth(-amount, curSkill);
 
-                    if (amount < 0 && RNG.Chance(1f / 3))
+                    if (amount < 0 && RNG.Chance(1f / 5))
                         StatusEffectManager.FLAMING.TryInflict(target);
 
                     user.Sp -= curSkill.Cost;
@@ -564,9 +590,9 @@ namespace Capstone_Chronicles
             #endregion
 
             #region WATER
-            Water_Pulse = new Skill<Actor, Actor>("Water Pulse", (user, target) =>
+            L1H1_Water_Pulse = new Skill<Actor, Actor>("Water Pulse", (user, target) =>
             {
-                var curSkill = Water_Pulse;
+                var curSkill = L1H1_Water_Pulse;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -579,9 +605,9 @@ namespace Capstone_Chronicles
             }
             , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
-            Water_Jet = new Skill<Actor, Actor>("Water Jet", (user, target) =>
+            L2H1_Water_Jet = new Skill<Actor, Actor>("Water Jet", (user, target) =>
             {
-                var curSkill = Water_Jet;
+                var curSkill = L2H1_Water_Jet;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -595,9 +621,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
-            Hydo_Cannon = new Skill<Actor, Actor>("Hydro Cannon", (user, target) =>
+            L3H1_Hydo_Cannon = new Skill<Actor, Actor>("Hydro Cannon", (user, target) =>
             {
-                var curSkill = Hydo_Cannon;
+                var curSkill = L3H1_Hydo_Cannon;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -617,9 +643,9 @@ namespace Capstone_Chronicles
             }
             , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.WATER);
 
-            Waterfall = new Skill<Actor, List<Actor>>("Waterfall", (user, targets) =>
+            L1Ha_Waterfall = new Skill<Actor, List<Actor>>("Waterfall", (user, targets) =>
             {
-                var curSkill = Waterfall;
+                var curSkill = L1Ha_Waterfall;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -637,9 +663,9 @@ namespace Capstone_Chronicles
             }
             , 9, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.WATER);
 
-            Deluge = new Skill<Actor, List<Actor>>("Deluge", (user, targets) =>
+            L2Ha_Deluge = new Skill<Actor, List<Actor>>("Deluge", (user, targets) =>
             {
-                var curSkill = Deluge;
+                var curSkill = L2Ha_Deluge;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -657,9 +683,9 @@ namespace Capstone_Chronicles
             }
             , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.WATER);
 
-            Tsunami = new Skill<Actor, List<Actor>>("Tsunami", (user, targets) =>
+            L3Ha_Tsunami = new Skill<Actor, List<Actor>>("Tsunami", (user, targets) =>
             {
-                var curSkill = Tsunami;
+                var curSkill = L3Ha_Tsunami;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -683,9 +709,9 @@ namespace Capstone_Chronicles
             #endregion
 
             #region PLANT
-            Vine_Whip = new Skill<Actor, Actor>("Vine Whip", (user, target) =>
+            L1H1_Vine_Whip = new Skill<Actor, Actor>("Vine Whip", (user, target) =>
             {
-                var curSkill = Vine_Whip;
+                var curSkill = L1H1_Vine_Whip;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -698,9 +724,9 @@ namespace Capstone_Chronicles
             }
             , 3, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
-            Leaf_Cutter = new Skill<Actor, Actor>("Leaf Cutter", (user, target) =>
+            L2H1_Leaf_Cutter = new Skill<Actor, Actor>("Leaf Cutter", (user, target) =>
             {
-                var curSkill = Leaf_Cutter;
+                var curSkill = L2H1_Leaf_Cutter;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -715,9 +741,9 @@ namespace Capstone_Chronicles
             }
             , 9, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
-            Needle_Tomb = new Skill<Actor, Actor>("Needle Tomb", (user, target) =>
+            L3H1_Needle_Tomb = new Skill<Actor, Actor>("Needle Tomb", (user, target) =>
             {
-                var curSkill = Needle_Tomb;
+                var curSkill = L3H1_Needle_Tomb;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -737,9 +763,9 @@ namespace Capstone_Chronicles
             }
             , 18, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.PLANT);
 
-            Leaf_Storm = new Skill<Actor, List<Actor>>("Leaf Storm", (user, targets) =>
+            L1Ha_Leaf_Storm = new Skill<Actor, List<Actor>>("Leaf Storm", (user, targets) =>
             {
-                var curSkill = Leaf_Storm;
+                var curSkill = L1Ha_Leaf_Storm;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -757,9 +783,9 @@ namespace Capstone_Chronicles
             }
             , 9, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT);
 
-            Root_Wave = new Skill<Actor, List<Actor>>("Root Wave", (user, targets) =>
+            L2Ha_Root_Wave = new Skill<Actor, List<Actor>>("Root Wave", (user, targets) =>
             {
-                var curSkill = Root_Wave;
+                var curSkill = L2Ha_Root_Wave;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -777,9 +803,9 @@ namespace Capstone_Chronicles
             }
             , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.PLANT);
 
-            Thorn_Canopy = new Skill<Actor, List<Actor>>("Thorn Canopy", (user, targets) =>
+            L3Ha_Thorn_Canopy = new Skill<Actor, List<Actor>>("Thorn Canopy", (user, targets) =>
             {
-                var curSkill = Thorn_Canopy;
+                var curSkill = L3Ha_Thorn_Canopy;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -802,12 +828,12 @@ namespace Capstone_Chronicles
             #endregion
 
             #region GROUND
-            Pebble_Blast = new Skill<Actor, Actor>("Pebble Blast", (user, target) =>
+            L1H1_Pebble_Blast = new Skill<Actor, Actor>("Pebble Blast", (user, target) =>
             {
-                var curSkill = Pebble_Blast;
+                var curSkill = L1H1_Pebble_Blast;
                 if (user.Sp >= curSkill.Cost)
                 {
-                    print($"{user.Name} used {curSkill.Name}", true);
+                    print($"{user.Name} used {curSkill.Name}");
 
                     int total = 0;
                     for (int i = 0; i < 6; i++)//can hit 6 times
@@ -838,9 +864,9 @@ namespace Capstone_Chronicles
             }
             , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
-            Geo_Shift = new Skill<Actor, Actor>("Geo Shift", (user, target) =>
+            L2H1_Geo_Shift = new Skill<Actor, Actor>("Geo Shift", (user, target) =>
             {
-                var curSkill = Geo_Shift;
+                var curSkill = L2H1_Geo_Shift;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -855,9 +881,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
-            Fissure = new Skill<Actor, Actor>("Fissure", (user, target) =>
+            L3H1_Fissure = new Skill<Actor, Actor>("Fissure", (user, target) =>
             {
-                var curSkill = Fissure;
+                var curSkill = L3H1_Fissure;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -872,9 +898,9 @@ namespace Capstone_Chronicles
             }
             , 24, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.GROUND);
 
-            Rock_Slide = new Skill<Actor, List<Actor>>("Rock Slide", (user, targets) =>
+            L1Ha_Rock_Slide = new Skill<Actor, List<Actor>>("Rock Slide", (user, targets) =>
             {
-                var curSkill = Rock_Slide;
+                var curSkill = L1Ha_Rock_Slide;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -911,9 +937,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.GROUND);
 
-            Spire_Wall = new Skill<Actor, List<Actor>>("Spire Wall", (user, targets) =>
+            L2Ha_Spire_Wall = new Skill<Actor, List<Actor>>("Spire Wall", (user, targets) =>
             {
-                var curSkill = Spire_Wall;
+                var curSkill = L2Ha_Spire_Wall;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -932,9 +958,9 @@ namespace Capstone_Chronicles
             }
             , 16, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.GROUND);
 
-            Earthquake = new Skill<Actor, List<Actor>>("Earthquake", (user, targets) =>
+            L3Ha_Earthquake = new Skill<Actor, List<Actor>>("Earthquake", (user, targets) =>
             {
-                var curSkill = Earthquake;
+                var curSkill = L3Ha_Earthquake;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -955,9 +981,9 @@ namespace Capstone_Chronicles
             #endregion
 
             #region AIR
-            Wind_Slash = new Skill<Actor, Actor>("Wind Slash", (user, target) =>
+            L1H1_Wind_Slash = new Skill<Actor, Actor>("Wind Slash", (user, target) =>
             {
-                var curSkill = Wind_Slash;
+                var curSkill = L1H1_Wind_Slash;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -970,9 +996,9 @@ namespace Capstone_Chronicles
             }
             , 4, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
-            Air_Cannon = new Skill<Actor, Actor>("Air Cannon", (user, target) =>
+            L2H1_Air_Cannon = new Skill<Actor, Actor>("Air Cannon", (user, target) =>
             {
-                var curSkill = Air_Cannon;
+                var curSkill = L2H1_Air_Cannon;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -986,9 +1012,9 @@ namespace Capstone_Chronicles
             }
             , 8, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
-            Sonic_Boom = new Skill<Actor, Actor>("Sonic Boom", (user, target) =>
+            L3H1_Sonic_Boom = new Skill<Actor, Actor>("Sonic Boom", (user, target) =>
             {
-                var curSkill = Sonic_Boom;
+                var curSkill = L3H1_Sonic_Boom;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1005,9 +1031,9 @@ namespace Capstone_Chronicles
             }
             , 28, SkillBase.TargetGroup.ONE_OPPONENT, ElementManager.AIR);
 
-            Slash_Storm = new Skill<Actor, List<Actor>>("Slash Storm", (user, targets) =>
+            L1Ha_Slash_Storm = new Skill<Actor, List<Actor>>("Slash Storm", (user, targets) =>
             {
-                var curSkill = Slash_Storm;
+                var curSkill = L1Ha_Slash_Storm;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1025,9 +1051,9 @@ namespace Capstone_Chronicles
             }
             , 7, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.AIR);
 
-            Sky_Crusher = new Skill<Actor, List<Actor>>("Sky Crusher", (user, targets) =>
+            L2Ha_Sky_Crusher = new Skill<Actor, List<Actor>>("Sky Crusher", (user, targets) =>
             {
-                var curSkill = Sky_Crusher;
+                var curSkill = L2Ha_Sky_Crusher;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");
@@ -1045,9 +1071,9 @@ namespace Capstone_Chronicles
             }
             , 14, SkillBase.TargetGroup.ALL_OPPONENTS, ElementManager.AIR);
 
-            Hurricane = new Skill<Actor, List<Actor>>("Hurricane", (user, targets) =>
+            L3Ha_Hurricane = new Skill<Actor, List<Actor>>("Hurricane", (user, targets) =>
             {
-                var curSkill = Hurricane;
+                var curSkill = L3Ha_Hurricane;
                 if (user.Sp >= curSkill.Cost)
                 {
                     print($"{user.Name} used {curSkill.Name}");

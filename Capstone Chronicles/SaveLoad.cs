@@ -6,7 +6,7 @@ namespace Capstone_Chronicles
     {
         public static string PersistentDataPath { get; private set; } = 
             $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/{Program.Name}/";//Windows will correct "/" to "\" 
-        public const int MAX_SAVE_SLOTS = 9;
+        public const int MAX_SAVE_SLOTS = 8;
 
         private static readonly JsonSerializerOptions options = new()
         {
@@ -63,6 +63,9 @@ namespace Capstone_Chronicles
         }
         public static T Load<T>(int slotNum, string key, string extension = ".sav")
         {
+            if (!SaveExists(slotNum, key, extension))
+                return default(T);
+
             string path = PersistentDataPath + "Saves/" + $"Slot {slotNum}/";
             string data = "";
 
@@ -74,6 +77,7 @@ namespace Capstone_Chronicles
             Program.print("Loaded " + key + extension + " from " + path);
 
             var result = JsonSerializer.Deserialize<T>(data, options);
+
             if (result != null)
                 return result;
             else

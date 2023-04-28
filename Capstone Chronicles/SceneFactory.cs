@@ -17,23 +17,38 @@ namespace Capstone_Chronicles
                 var options = new List<Button>() {
                     new Button("Start", (menu) =>
                     {
-                        Console.Beep(100, 60);
                         nameField.SetActive(true, false);
                     }),
-                    new Button("Options", (menu) =>
+                    new Button("Load Game", menu =>
                     {
-                        Console.Beep(150, 160);
-                        menu.closeAfterConfirm = false;
+                        Scene.fileSelect.ClearOptions(false);
+                        int slot = 0;
+                        var used = SaveLoad.GetUsedSaveSlots();
+
+                        for (int i = 0; i < used.Count; i++)
+                        {
+                            var index = i;
+                            Scene.fileSelect.Add(new Button($"Slot {used[index]}", menu =>
+                            {
+                                slot = used[index];
+                            }), false);
+                        }
+
+                        GameManager.ActiveInteractiveElement.SetActive(false);
+                        Scene.fileSelect.SetActive(true);
+
+                        GameManager.LoadGame(slot);
+                        Scene.fileSelect.ClearOptions(true);
                     }),
                     new Button("Exit", (menu) =>
                     {
-                        Console.Beep(250, 20);
                         Program.Exit();
                     })
                     };
 
                 //http://www.patorjk.com/software/taag/#p=display&h=1&v=0&f=Calvin%20S&t=%20Capstone%20%20%20%0A%20%20Chronicles
                 var title = @"
+
   ╔═╗┌─┐┌─┐┌─┐┌┬┐┌─┐┌┐┌┌─┐      
   ║  ├─┤├─┘└─┐ │ │ ││││├┤       
   ╚═╝┴ ┴┴  └─┘ ┴ └─┘┘└┘└─┘      
@@ -59,6 +74,36 @@ namespace Capstone_Chronicles
             //The components are filled out by the BattleScene itself
             //Switching to this scene will automatically trigger a battle
             return new BattleScene(encounter);
+        }
+
+        public static Scene EndingScene {
+            get
+            {
+                return new Scene(() =>
+                {
+                    Scene.Current.ToggleInfoLabels(true);
+
+                    Scene.print(
+@$"You made this climb to find out the truth of the legendary Capstone and here it is in front of you.
+All {HeroManager.Party.Count} of you look at each other and nod.
+{HeroManager.Player.Name} reaches their hand out to touch it and suddenly a blinding light surrounds the team.
+The rumors were true, it really is a portal!
+"
+                    , false, -1, false);
+
+                    Scene.print("It seems the adventure is only just beginning!", false, -1, false);
+                    Scene.print(
+@"
+
+ ▀█▀ █▄█ ▄▀▄ █▄ █ █▄▀ ▄▀▀   █▀ ▄▀▄ █▀▄   █▀▄ █   ▄▀▄ ▀▄▀ █ █▄ █ ▄▀ 
+  █  █ █ █▀█ █ ▀█ █ █ ▄██   █▀ ▀▄▀ █▀▄   █▀  █▄▄ █▀█  █  █ █ ▀█ ▀▄█
+
+
+", false, -1);
+                    Program.Exit();
+                },
+                null, Array.Empty<GUIComponent>());
+            }
         }
 
     }

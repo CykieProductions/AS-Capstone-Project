@@ -29,13 +29,13 @@ namespace Capstone_Chronicles
 
         /// <summary>
         /// Weak To: plant, electric |
-        /// Resists: water, ground
+        /// Resists: water, fire
         /// </summary>
         public static Element WATER { get; private set; } = new Element(Element.Type.WATER);
 
         /// <summary>
         /// Weak To: fire |
-        /// Resists: water
+        /// Resists: water, ground
         /// </summary>
         public static Element PLANT { get; private set; } = new Element(Element.Type.PLANT);
 
@@ -48,8 +48,8 @@ namespace Capstone_Chronicles
 
         /// <summary>
         /// Weak To: electric |
-        /// Resists: air |
-        /// Ignores: normal, ground
+        /// Resists: air, ground |
+        /// Ignores: normal
         /// </summary>
         public static Element AIR { get; private set; } = new Element(Element.Type.AIR);
 
@@ -98,7 +98,7 @@ namespace Capstone_Chronicles
 
             /// <summary>
             /// Weak To: plant, electric |
-            /// Resists: water, ground
+            /// Resists: water, fire
             /// </summary>
             WATER._Initialize
                 (
@@ -109,7 +109,7 @@ namespace Capstone_Chronicles
 
             /// <summary>
             /// Weak To: fire |
-            /// Resists: water
+            /// Resists: water, ground
             /// </summary>
             PLANT._Initialize
                 (
@@ -126,8 +126,8 @@ namespace Capstone_Chronicles
             GROUND._Initialize
                 (
                 effectiveAgainst: new Element[] { FIRE, ELECTRIC },
-                ineffectiveAgainst: new Element[] { WATER },
-                uselessAgainst: new Element[] { AIR }
+                ineffectiveAgainst: new Element[] { PLANT, AIR },
+                uselessAgainst: new Element[] {  }
                 );
 
             /// <summary>

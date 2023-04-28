@@ -12,12 +12,13 @@ namespace Capstone_Chronicles
     public class OverworldScene : Scene
     {
 
-        public Area AreaInfo { get; set; }
+        public Area Area { get; set; }
 
         static Hero curHero = HeroManager.Party[0];
 
         #region GUI References
-        static Label bottomText = new("");
+
+        static readonly Menu areaMenu = new("Which Area?", new(), true, false, 4, inEnabled: false);
 
         static readonly Menu ActionMenuTemplate = new Menu(
             new Label(dynamicText: () =>
@@ -40,7 +41,7 @@ namespace Capstone_Chronicles
             {
                 new Button("Proceed", menu =>
                 {
-                    Area area = ((OverworldScene)Current).AreaInfo;
+                    Area area = ((OverworldScene)Current).Area;
 
                     if (!area.TryGetFixedEncounter(out Encounter encounter))
                     {
@@ -52,7 +53,7 @@ namespace Capstone_Chronicles
                 new Button("Skills", menu =>
                 {
                 Start:
-                    curHero = RunTargetMenu(actionMenu);
+                    curHero = RunTargetMenu(actionMenu, false);
                     if (curHero == null) return;
 
                     if (curHero.skills.Count > 0)
@@ -72,15 +73,66 @@ namespace Capstone_Chronicles
                     if (curHero!= null)
                         DisplayStats(curHero);
                 }),
+                new Button("Warp", menu =>
+                {
+                    Area area;
+                    for (int i = 0; i < AreaManager.areaList.Count; i++)
+                    {
+                        var name = AreaManager.areaList[i].Name;
+                        if (!AreaManager.areaList[i].Started)
+#if !DEBUG
+                            continue;
+#else
+                            name += " [Skip]";
+#endif
+                        var index = i;
+                        areaMenu.Add(new Button(name, menu =>
+                        {
+                            area = AreaManager.areaList[index];
+                            ((OverworldScene)Current).Area = area;
+                            area.ModifyProgress(0, true);
+                        }), false);
+                    }
+
+                    actionMenu.SetActive(false);
+                    areaMenu.SetActive(true);
+
+                    areaMenu.ClearOptions(true);
+                    GameManager.ChangeScene(SceneFactory.Overworld);
+                }),
                 new Button("Save", menu =>
                 {
-                    curHero.nextAction = SkillManager.Guard;
+                    Scene.fileSelect.ClearOptions(false);
+                    int slot = 0;
+                    for (int i = 0; i < SaveLoad.MAX_SAVE_SLOTS; i++)
+                    {
+                        var index = i;
+                        string info = " [Empty]";
+                        if (SaveLoad.SaveExists(i + 1, HeroManager.PLAYER_SAVE_KEY))
+                        {
+                            var stats = SaveLoad.Load<Actor.StatsStruct>(index + 1, HeroManager.PLAYER_SAVE_KEY);
+                            info = $" [{stats.Name}: LV {stats.Level}]";
+                        }
+
+                        Scene.fileSelect.Add(new Button($"Slot {i + 1}" + info, menu =>
+                        {
+                            slot = index + 1;
+                        }), false);
+                    }
+
+                    actionMenu.SetActive(false);
+                    Current.ToggleInfoLabels(false);
+                    Scene.fileSelect.SetActive(true);
+                    
+                    GameManager.SaveGame(slot);
+                    Scene.fileSelect.ClearOptions(true);
+                    Current.ToggleInfoLabels(true);
                 }),
                 new Button("Quit", menu =>
                 {
                     GameManager.ChangeScene(SceneFactory.TitleScreen);
                 }),
-            });
+            }, true, false, 3);
 
 
         static Menu actionMenu = ActionMenuTemplate.ShallowCopy();
@@ -92,16 +144,17 @@ namespace Capstone_Chronicles
             {
 
             });
-        #endregion
+#endregion
 
         public OverworldScene(Area area, Action? startAction = null, Action? exitAction = null, GUIComponent[]? inElements = null) 
             : base(startAction, exitAction, inElements ?? Array.Empty<GUIComponent>())
         {
-            AreaInfo = area;
+            Area = area;
 
             AddGUIElement(actionMenu, false);
             AddGUIElement(targetMenu, false);
             AddGUIElement(skillMenu, false);
+            AddGUIElement(areaMenu, false);
             AddGUIElement(skillInfoLabel, false);
         }
 
@@ -135,7 +188,7 @@ namespace Capstone_Chronicles
             }
         }
 
-        static Hero? RunTargetMenu(Menu? previous)
+        static Hero? RunTargetMenu(Menu? previous, bool includeInactive = true)
         {
             if (previous != null)
                 CanGoBack = true;
@@ -145,6 +198,9 @@ namespace Capstone_Chronicles
             targetMenu.ClearOptions(false);
             foreach (var hero in HeroManager.Party)
             {
+                if (!includeInactive && hero.Hp <= 0)
+                    continue;
+
                 targetMenu.Add(new Button(hero.Name + $" | HP: {hero.Hp}/{hero.MaxHp} | SP: {hero.Sp}/{hero.MaxSp}", (menu) =>
                 {
                     target = hero;

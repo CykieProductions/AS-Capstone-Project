@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
@@ -16,6 +17,7 @@ namespace Capstone_Chronicles
         /// <summary> Used to initialize Actors in a cleaner looking way </summary>
         public struct StatsStruct
         {
+            public string Name { get; set; }
             public int Level { get; set; } = 1;
             public int MaxHp { get; set; } = 10;
             public int Hp { get; set; } = 10;
@@ -27,10 +29,12 @@ namespace Capstone_Chronicles
             public int Special { get; set; } = 1;
             public int Speed { get; set; } = 1;
             public int Exp { get; set; } = 5;
+            public int NeededExp { get; set; } = 0;
 
             //Fully custom constructor
+            [JsonConstructor]
             public StatsStruct(int level, int maxHp, int hp, int maxSp, int sp,
-                int attack, int defense, int special, int speed, int exp)
+                int attack, int defense, int special, int speed, int exp, int neededExp = 0, string name = "")
             {
                 Level = level;
                 MaxHp = maxHp;
@@ -42,10 +46,12 @@ namespace Capstone_Chronicles
                 Special = special;
                 Speed = speed;
                 Exp = exp;
+                NeededExp = neededExp;
+                Name = name;
             }
             //Simplified constructor
             public StatsStruct(int level, int maxHp, int maxSp,
-                int attack, int defense, int special, int speed, int exp = 0)
+                int attack, int defense, int special, int speed, int exp = 0, int neededExp = 0)
             {
                 Level = level;
                 MaxHp = maxHp;
@@ -57,6 +63,8 @@ namespace Capstone_Chronicles
                 Special = special;
                 Speed = speed;
                 Exp = exp;
+                NeededExp = neededExp;
+                Name = "";
             }
             //From Actor constructor
             public StatsStruct(Actor actor, int lv = 0)
@@ -71,6 +79,11 @@ namespace Capstone_Chronicles
                 Special =   actor.Special;
                 Speed =     actor.Speed;
                 Exp =       actor.Exp;
+                NeededExp = 0;
+
+                if (actor is Hero)
+                    NeededExp = (actor as Hero).NeededExp;
+                Name = actor.Name;
             }
 
         }
