@@ -6,6 +6,9 @@ using static Capstone_Chronicles.BattleScene;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// The <see cref="Scene"/> that battles take place in
+    /// </summary>
     public class BattleScene : Scene
     {
         public enum RoundResult
@@ -18,6 +21,9 @@ namespace Capstone_Chronicles
         static Hero? curHero = HeroManager.Party[0];
 
         static List<Enemy> enemies = new();
+        /// <summary>
+        /// The current/last enemy to make a decision
+        /// </summary>
         public static Enemy? DecidingEnemy { get; private set; }
 
         static bool openSkillMenu = false;
@@ -91,6 +97,10 @@ namespace Capstone_Chronicles
 
         private Encounter encounterData;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BattleScene"/> class.
+        /// </summary>
+        /// <param name="encounter">The encounter data to load</param>
         public BattleScene(Encounter encounter) 
             : base(Array.Empty<GUIComponent>())
         {
@@ -462,7 +472,8 @@ namespace Capstone_Chronicles
                         if ((targets[t].Hp <= 0 && curActor.nextAction.actionType != SkillBase.ActionType.REVIVAL) || (targets[t] is Enemy && !enemies.Contains(targets[t])))
                             moddedTargetList.Remove(targets[t]);
                     }
-                    (curActor.nextAction as Skill<Actor, List<Actor>>).Use(curActor, moddedTargetList);
+                    (curActor.nextAction as Skill<Actor, List<Actor>>)?.Use(curActor, moddedTargetList);
+                    (curActor.nextAction as Skill<Actor, Actor>)?.Use(curActor, moddedTargetList[0]);
                 }
                 //Target(s) Not Specified
                 else

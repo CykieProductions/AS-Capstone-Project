@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Stores information on all <see cref="Element"/>s
+    /// </summary>
     public static class ElementManager
     {
         #region All Elements
@@ -63,10 +66,6 @@ namespace Capstone_Chronicles
         //Static constructor to initialize the strengths and weaknesses of all above elements
         static ElementManager()
         {
-            /// <summary>
-            /// Weak To: nothing |
-            /// Resists: nothing
-            /// </summary>
             OMNI._Initialize
                 (
                 effectiveAgainst: new Element[] { },
@@ -74,10 +73,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { }
                 );
 
-            /// <summary>
-            /// Weak To: nothing |
-            /// Resists: nothing
-            /// </summary>
             NORMAL._Initialize
                 (
                 effectiveAgainst: new Element[] { },
@@ -85,10 +80,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { AIR }
                 );
 
-            /// <summary>
-            /// Weak To: water, ground, air |
-            /// Resists: fire, plant, electric
-            /// </summary>
             FIRE._Initialize
                 (
                 effectiveAgainst: new Element[] { PLANT },
@@ -96,10 +87,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { }
                 );
 
-            /// <summary>
-            /// Weak To: plant, electric |
-            /// Resists: water, fire
-            /// </summary>
             WATER._Initialize
                 (
                 effectiveAgainst: new Element[] { FIRE, GROUND },
@@ -107,10 +94,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { }
                 );
 
-            /// <summary>
-            /// Weak To: fire |
-            /// Resists: water, ground
-            /// </summary>
             PLANT._Initialize
                 (
                 effectiveAgainst: new Element[] { GROUND, WATER },
@@ -118,11 +101,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { }
                 );
 
-            /// <summary>
-            /// Weak To: water, plant |
-            /// Resists: normal, fire |
-            /// Ignores: electric
-            /// </summary>
             GROUND._Initialize
                 (
                 effectiveAgainst: new Element[] { FIRE, ELECTRIC },
@@ -130,11 +108,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] {  }
                 );
 
-            /// <summary>
-            /// Weak To: electric |
-            /// Resists: air |
-            /// Ignores: normal, ground
-            /// </summary>
             AIR._Initialize
                 (
                 effectiveAgainst: new Element[] { FIRE },
@@ -142,10 +115,6 @@ namespace Capstone_Chronicles
                 uselessAgainst: new Element[] { }
                 );
 
-            /// <summary>
-            /// Weak To: ground |
-            /// Resist: air, electric
-            /// </summary>
             ELECTRIC._Initialize
                 (
                 effectiveAgainst: new Element[] { WATER, AIR },
@@ -154,10 +123,25 @@ namespace Capstone_Chronicles
                 );
         }
 
+        /// <summary>
+        /// Bonus damage scalar
+        /// </summary>
         public const float BONUS_MULT = 1.75f;
+        /// <summary>
+        /// Damage reduction scalar
+        /// </summary>
         public const float REDUCED_MULT = 0.5f;
+        /// <summary>
+        /// Extreme damage reduction scalar
+        /// </summary>
         public const float USELESS_MULT = 0f;
 
+        /// <summary>
+        /// Calculates the attack damage multiplier
+        /// </summary>
+        /// <param name="attackElement">The element of the attack</param>
+        /// <param name="target">The target</param>
+        /// <returns>A float: damage multiplier</returns>
         public static float CalculateAttackMultiplier(Element attackElement, Actor target)
         {
             float mult = 1;
@@ -183,12 +167,18 @@ namespace Capstone_Chronicles
         }
     }
 
+    /// <summary>
+    /// Data on the strengths and weaknesses of special attacks and Actors
+    /// </summary>
     public class Element
     {
         public enum Type
         {
             OMNI, NORMAL, FIRE, WATER, PLANT, GROUND, AIR, ELECTRIC
         }
+        /// <summary>
+        /// The name of the Element
+        /// </summary>
         public string Name { get; private set; }
 
 
@@ -201,11 +191,11 @@ namespace Capstone_Chronicles
         /// <summary>
         /// Constructs a new element with strengths and weaknesses
         /// </summary>
-        /// <param name="inName"></param>
+        /// <param name="inName">The name</param>
         /// <param name="effectiveAgainst">Elements that I do bonus damage to</param>
         /// <param name="ineffectiveAgainst">Elements that I do reduced damage to</param>
         /// <param name="uselessAgainst">Elements that I can't affect</param>
-        /// <param name="unfazedBy">Ensures I can't be affected by the basic elements. Only used for temporary elements</param>
+        /// <param name="unfazedBy">Ensures I can't be affected by some of the basic elements. Only used for temporary elements</param>
         public Element(Type inName, Element[]? effectiveAgainst = null, Element[]? ineffectiveAgainst = null, 
             Element[]? uselessAgainst = null, Element[]? unfazedBy = null) 
         {
@@ -218,6 +208,15 @@ namespace Capstone_Chronicles
                 this.unfazedBy = unfazedBy;
         }
 
+        /// <summary>
+        /// Constructs a new temporary element based on an existing one
+        /// </summary>
+        /// <param name="baseElement">The element to copy</param>
+        /// <param name="inName">The name</param>
+        /// <param name="unfazedBy">Ensures I can't be affected by specific elements</param>
+        /// <param name="effectiveAgainst">Elements that I do bonus damage to</param>
+        /// <param name="ineffectiveAgainst">Elements that I do reduced damage to</param>
+        /// <param name="uselessAgainst">Elements that I can't affect</param>
         public Element(Element baseElement, string? inName = null, Element[]? unfazedBy = null, Element[]? effectiveAgainst = null, Element[]? ineffectiveAgainst = null,
             Element[]? uselessAgainst = null)
         {
@@ -244,21 +243,39 @@ namespace Capstone_Chronicles
             this.uselessAgainst ??= uselessAgainst;
         }
 
+        /// <summary>
+        /// Am I effective against a defending element?
+        /// </summary>
+        /// <param name="defender">The defending element</param>
+        /// <returns>A bool: true if effective</returns>
         public bool IsEffectiveAgainst(Element defender)
         {
             return effectiveAgainst.Contains(defender);
         }
+        /// <summary>
+        /// Am I ineffective against a defending element?
+        /// </summary>
+        /// <param name="defender">The defending element</param>
+        /// <returns>A bool: true if ineffective</returns>
         public bool IsIneffectiveAgainst(Element defender)
         {
             return ineffectiveAgainst.Contains(defender);
         }
+        /// <summary>
+        /// Am I useless against a defending element?
+        /// </summary>
+        /// <param name="defender">The defending element</param>
+        /// <returns>A bool: true if useless</returns>
         public bool IsUselessAgainst(Element defender)
         {
             return uselessAgainst.Contains(defender);
         }
-        /// <summary>
-        /// Only used for special elements
+
+        /// /// <summary>
+        /// Am I immune to an attacking element? Only used for special elements
         /// </summary>
+        /// <param name="attacker">The attacking element</param>
+        /// <returns>A bool: true if immune</returns>
         public bool IsUnfazedBy(Element attacker)
         {
             return unfazedBy.Contains(attacker);

@@ -16,19 +16,31 @@ namespace Capstone_Chronicles
         /// Same as GameManager.CurrentScene
         /// </summary>
         public static Scene Current { get => GameManager.CurrentScene; }
+        /// <summary>
+        /// Same as GameManager.PreviousScene
+        /// </summary>
         public static Scene Previous { get => GameManager.PreviousScene; }
+        /// <summary>
+        /// Will the back button work?
+        /// </summary>
         public static bool CanGoBack { get; protected set; }
 
         /// <summary>
         /// Set false when the scene refreshes or changes
         /// </summary>
         protected static bool goBack;
+        /// <summary>
+        /// Should I be able to display text through the print function?
+        /// </summary>
         public static bool EnablePrinting { get; set; } = true;
 
         readonly Action? OnStart = null;
         readonly Action? OnExit = null;
         private List<GUIComponent> elements;
 
+        /// <summary>
+        /// Triggered when a the screen is redisplayed
+        /// </summary>
         public Action? OnRenderComplete;
 
         public static readonly Menu fileSelect = new("Which File?", new(), true, false, 4, inEnabled: false);
@@ -47,7 +59,9 @@ namespace Capstone_Chronicles
 
         //
 
-        //Default way to print stuff to the screen
+        /// <summary>
+        /// Default way to print stuff to the screen
+        /// </summary>
         protected Label[] infoLabels = new Label[]
         {
             new Label("", null, false),
@@ -74,17 +88,33 @@ namespace Capstone_Chronicles
                 elements[i].SetParentScreen(this);
             }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Scene"/> class.
+        /// </summary>
+        /// <param name="inElements">The GUI elements in this Scene</param>
         public Scene(GUIComponent[] inElements)
         {
             _BaseConstructor(inElements);
         }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Scene"/> class.
+        /// </summary>
+        /// <param name="startAction">The start action</param>
+        /// <param name="exitAction">The exit action</param>
+        /// <param name="inElements">The GUI elements in this Scene</param>
         public Scene(Action? startAction, Action? exitAction, GUIComponent[] inElements)
         {
             OnStart = startAction;
             OnExit = exitAction;
             _BaseConstructor(inElements);
         }
-        
+
+        /// <summary>
+        /// Adds a GUI element to the Scene
+        /// </summary>
+        /// <param name="newElement">The new element</param>
+        /// <param name="enabled">If true, display the new element</param>
         public void AddGUIElement(GUIComponent newElement, bool enabled)
         {
             newElement.SetParentScreen(this);
@@ -93,12 +123,18 @@ namespace Capstone_Chronicles
             newElement.SetActive(enabled, false);
         }
 
+        /// <summary>
+        /// The player pressed the back button, so try to go back
+        /// </summary>
         public static void BackButtonPressed()
         {
             if (CanGoBack)
                 goBack = true;
         }
 
+        /// <summary>
+        /// Clear out and then redisplays all GUI elements
+        /// </summary>
         public void Refresh()
         {
             Console.Clear();
@@ -115,6 +151,10 @@ namespace Capstone_Chronicles
             OnRenderComplete?.Invoke();
         }
 
+        /// <summary>
+        /// Display information on the currently selected skill
+        /// </summary>
+        /// <param name="menu"></param>
         protected static void TryUpdateSkillDescription(Menu menu)
         {
             if (skillInfoLabel.ParentScreen == null)
@@ -137,16 +177,22 @@ namespace Capstone_Chronicles
         /// <summary>
         /// Displays information using the appropriate logic for the current scene type
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="message"></param>
+        /// <param name="message">The message to display</param>
         /// <param name="singleLine">Should I stay on the same line afterward</param>
         /// <param name="delayAfter">Delay before moving on to the next line (-1 means manual)</param>
+        /// <param name="instant">If true, don't print the message char by char</param>
         public static void print<T>(T message, bool singleLine = false, float delayAfter = 0.75f, bool instant = true)
         {
             if (EnablePrinting)
                 GameManager.CurrentScene?.Log(message, singleLine, delayAfter, instant ? 0 : 0.02f);
         }
-
+        /// <summary>
+        /// Displays information using the appropriate logic for the current scene type
+        /// </summary>
+        /// <param name="message">The message to display</param>
+        /// <param name="singleLine">Should I stay on the same line afterward</param>
+        /// <param name="delayAfter">Delay before moving on to the next line (-1 means manual)</param>
+        /// <param name="textSpeed">The delay before printing another char</param>
         protected virtual void Log<T>(T message, bool singleLine = false, float delayAfter = 0.75f, float textSpeed = 0)
         {
             var text = message?.ToString();
@@ -223,6 +269,10 @@ namespace Capstone_Chronicles
             }
         }
 
+        /// <summary>
+        /// Toggles the info labels on or off
+        /// </summary>
+        /// <param name="enabled">If true, display the info labels</param>
         public void ToggleInfoLabels(bool enabled)
         {
             if (enabled == true)
@@ -243,7 +293,7 @@ namespace Capstone_Chronicles
         }
 
         /// <summary>
-        /// Called when the scene is first switched to
+        /// Called when the scene is switched to
         /// </summary>
         public virtual void Start()
         {
@@ -253,7 +303,7 @@ namespace Capstone_Chronicles
         }
 
         /// <summary>
-        /// Called right before the scene is switched.
+        /// Called right before the scene is switched away from
         /// </summary>
         public virtual void Exit()
         {

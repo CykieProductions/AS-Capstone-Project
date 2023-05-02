@@ -9,6 +9,9 @@ namespace Capstone_Chronicles
 {
     public partial class Actor
     {
+        /// <summary>
+        /// Used for level up stat increases
+        /// </summary>
         public enum StatType
         {
             Max_HP, Max_SP, Attack, Defense, Special, Speed, Exp
@@ -31,7 +34,9 @@ namespace Capstone_Chronicles
             public int Exp { get; set; } = 5;
             public int NeededExp { get; set; } = 0;
 
-            //Fully custom constructor
+            /// <summary>
+            /// Fully custom constructor
+            /// </summary>
             [JsonConstructor]
             public StatsStruct(int level, int maxHp, int hp, int maxSp, int sp,
                 int attack, int defense, int special, int speed, int exp, int neededExp = 0, string name = "")
@@ -49,7 +54,9 @@ namespace Capstone_Chronicles
                 NeededExp = neededExp;
                 Name = name;
             }
-            //Simplified constructor
+            /// <summary>
+            /// Simplified constructor
+            /// </summary>
             public StatsStruct(int level, int maxHp, int maxSp,
                 int attack, int defense, int special, int speed, int exp = 0, int neededExp = 0)
             {
@@ -66,7 +73,12 @@ namespace Capstone_Chronicles
                 NeededExp = neededExp;
                 Name = "";
             }
-            //From Actor constructor
+
+            /// <summary>
+            /// Constructs a new <see cref="StatsStruct"/> using data from an <see cref="Actor"/>
+            /// </summary>
+            /// <param name="actor">The actor to pull data from</param>
+            /// <param name="lv">Overrides the Actors level if above 0</param>
             public StatsStruct(Actor actor, int lv = 0)
             {
                 Level =     lv <= 0 ? actor.Level : lv;

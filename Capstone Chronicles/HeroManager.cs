@@ -2,9 +2,12 @@
 
 namespace Capstone_Chronicles
 {
-    static class HeroManager
+    /// <summary>
+    /// Contains all <see cref="Hero"/> objects and related information
+    /// </summary>
+    internal static class HeroManager
     {
-        public const string SAVE_KEY = "CURRENT_PARTY";
+        private const string SAVE_KEY = "CURRENT_PARTY";
         public const string PLAYER_SAVE_KEY = "PLAYER_CHARACTER";
 
         public static Hero Player { get; private set; } = InitPlayer();//Air + Electric
@@ -20,7 +23,7 @@ namespace Capstone_Chronicles
             GameManager.BeginLoad += Load;
         }
 
-        static void Save(int slot)
+        private static void Save(int slot)
         {
             List<string> heroesInParty = new();
             heroesInParty.Add("PLAYER");
@@ -32,7 +35,7 @@ namespace Capstone_Chronicles
 
             SaveLoad.Save(heroesInParty, slot, SAVE_KEY);
         }
-        static void Load(int slot)
+        private static void Load(int slot)
         {
             List<string> heroesInParty = SaveLoad.Load<List<string>>(slot, SAVE_KEY);
             if (heroesInParty == null)
@@ -92,13 +95,6 @@ namespace Capstone_Chronicles
 
             var hero = new Hero("Cyclone", stats, growthInfo, skillDict, saveKey: PLAYER_SAVE_KEY);
 
-            //TODO remove
-            /*hero.skills = new()
-            {
-                SkillManager.Damage_Allies_Test,
-            };
-            //*/
-
             return hero;
         }
 
@@ -110,7 +106,7 @@ namespace Capstone_Chronicles
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1.1f),
                 _spInfo: (StatGrowth.GrowthCurve.Square, 1.5f),
                 _attackInfo: (StatGrowth.GrowthCurve.Square, .8f),
-                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.2f),
                 _specialInfo: (StatGrowth.GrowthCurve.Log, 1f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0.2f),
                 _expInfo: (StatGrowth.GrowthCurve.Linear, 0.6f)
@@ -146,7 +142,7 @@ namespace Capstone_Chronicles
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1.3f),
                 _spInfo: (StatGrowth.GrowthCurve.Log, 1.2f),
                 _attackInfo: (StatGrowth.GrowthCurve.Square, .8f),
-                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.3f),
                 _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0.1f),
                 _expInfo: (StatGrowth.GrowthCurve.Linear, 0.55f)
@@ -180,7 +176,7 @@ namespace Capstone_Chronicles
                 _hpInfo: (StatGrowth.GrowthCurve.Log, 1.5f),
                 _spInfo: (StatGrowth.GrowthCurve.Square, .9f),
                 _attackInfo: (StatGrowth.GrowthCurve.Square, 1.1f),
-                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.5f),
+                _defenseInfo: (StatGrowth.GrowthCurve.Linear, 0.2f),
                 _specialInfo: (StatGrowth.GrowthCurve.Square, .8f),
                 _speedInfo: (StatGrowth.GrowthCurve.Linear, 0.1f),
                 _expInfo: (StatGrowth.GrowthCurve.Linear, 0.5f)
@@ -205,21 +201,6 @@ namespace Capstone_Chronicles
             };
 
             var hero = new Hero("Tessa", stats, growthInfo, skillDict, ElementManager.NORMAL);
-
-            //TODO remove
-            /*hero.skills = new()
-            {
-                SkillManager.Damage_Allies_Test,
-                SkillManager.Ignite_Allies_Test,
-                SkillManager.Poison_Allies_Test,
-                SkillManager.Restore_SP_Allies_Test,
-                SkillManager.Fireball,
-                SkillManager.Flame_Burst,
-                SkillManager.Eruption,
-                SkillManager.Flare_Fall,
-                SkillManager.Blazing_Vortex,
-                SkillManager.Supernova
-            };//*/
 
             return hero;
         }

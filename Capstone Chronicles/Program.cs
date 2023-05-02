@@ -69,7 +69,7 @@ namespace Capstone_Chronicles
         [Obsolete("This will only work in debug mode. Use a Label for actual text!", false)]
         public static void print<T>(T message, bool singleLine = false)
         {
-#if DEBUG//fix
+#if DEBUG
             if (GetCursorPosition().Left == 0)
                 Write("DEBUG: ");
             Write(message?.ToString() + (singleLine ? null : '\n'));
@@ -78,22 +78,6 @@ namespace Capstone_Chronicles
 #endif
         }
     }
-
-    public static class Input
-    {
-        public static ConsoleKey PauseKey { get; private set; } = ConsoleKey.Escape;
-
-        public static bool GetKeyDown(ConsoleKey key)
-        {
-            bool result = false;
-
-            if (KeyAvailable && ReadKey(true).Key == key)
-                result = true;
-
-            return result;
-        }
-    }
-
 
     /// <summary>
     /// A class to contain all extension methods for this project
@@ -166,10 +150,20 @@ namespace Capstone_Chronicles
 
             return false;
         }
+
+        /// <summary>
+        /// Gets a random element from a sequence
+        /// </summary>
+        /// <param name="sequence">The sequence</param>
+        /// <returns>An object of type <typeparamref name="T"/></returns>
         public static T GetRandomElement<T>(this IEnumerable<T> sequence)
         {
             return sequence.ElementAt(RNG.Rand.Next(0, sequence.Count()));
         }
+        /// <summary>
+        /// Removes a random element from a collection
+        /// </summary>
+        /// <param name="sequence">The collection</param>
         public static void RemoveRandomElement<T>(this ICollection<T> sequence)
         {
             sequence.Remove(sequence.ElementAt(RNG.Rand.Next(0, sequence.Count)));

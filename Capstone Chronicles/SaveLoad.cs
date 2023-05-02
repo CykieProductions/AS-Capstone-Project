@@ -2,10 +2,19 @@
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Used for Saving and Loading game data
+    /// </summary>
     public static class SaveLoad
     {
+        /// <summary>
+        /// The program's persistent data path
+        /// </summary>
         public static string PersistentDataPath { get; private set; } = 
             $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/{Program.Name}/";//Windows will correct "/" to "\" 
+        /// <summary>
+        /// The max number of slots you can save to
+        /// </summary>
         public const int MAX_SAVE_SLOTS = 8;
 
         private static readonly JsonSerializerOptions options = new()
@@ -21,6 +30,13 @@ namespace Capstone_Chronicles
             PersistentDataPath = d.FullName;//Corrects slashes
         }
 
+        /// <summary>
+        /// Checks if the save data exists
+        /// </summary>
+        /// <param name="slotNum">The slot number</param>
+        /// <param name="key">The unique save key</param>
+        /// <param name="extension">The file extension</param>
+        /// <returns>A bool: true if successful</returns>
         public static bool SaveExists(int slotNum, string key, string extension = ".sav")
         {
             bool successful;
@@ -34,6 +50,11 @@ namespace Capstone_Chronicles
 
             return successful;
         }
+
+        /// <summary>
+        /// Gets the slot numbers currently in use
+        /// </summary>
+        /// <returns>A list of int: slot numbers</returns>
         public static List<int> GetUsedSaveSlots()
         {
             List<int> output = new();
@@ -48,6 +69,13 @@ namespace Capstone_Chronicles
             return output;
         }
 
+        /// <summary>
+        /// Saves the object into a file
+        /// </summary>
+        /// <param name="objToSave">The object to save</param>
+        /// <param name="slotNum">The slot number</param>
+        /// <param name="key">The unique save key</param>
+        /// <param name="extension">The file extension</param>
         public static void Save<T>(T objToSave, int slotNum, string key, string extension = ".sav")
         {
             string path = PersistentDataPath + "Saves/" + $"Slot {slotNum}/";
@@ -61,6 +89,14 @@ namespace Capstone_Chronicles
             }
             Program.print("Saved " + key + extension + " to " + path);
         }
+
+        /// <summary>
+        /// Loads an object from a file
+        /// </summary>
+        /// <param name="objToSave">The object to save</param>
+        /// <param name="slotNum">The slot number</param>
+        /// <param name="key">The unique save key</param>
+        /// <param name="extension">The file extension</param>
         public static T Load<T>(int slotNum, string key, string extension = ".sav")
         {
             if (!SaveExists(slotNum, key, extension))

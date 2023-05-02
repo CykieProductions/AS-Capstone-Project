@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// The main <see cref="Scene"/> type outside of battles
+    /// </summary>
     public class OverworldScene : Scene
     {
 
@@ -144,8 +147,15 @@ namespace Capstone_Chronicles
             {
 
             });
-#endregion
+        #endregion
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OverworldScene"/> class.
+        /// </summary>
+        /// <param name="area">The area to start with</param>
+        /// <param name="startAction">The action to trigger when switched to</param>
+        /// <param name="exitAction">The action to trigger when switched away from</param>
+        /// <param name="inElements">The GUI elements owned by this Scene</param>
         public OverworldScene(Area area, Action? startAction = null, Action? exitAction = null, GUIComponent[]? inElements = null) 
             : base(startAction, exitAction, inElements ?? Array.Empty<GUIComponent>())
         {

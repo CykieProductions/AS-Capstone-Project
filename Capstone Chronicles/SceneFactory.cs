@@ -2,8 +2,14 @@
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Contains data/references for all Scenes
+    /// </summary>
     public static class SceneFactory
     {
+        /// <summary>
+        /// The title scene
+        /// </summary>
         public static Scene TitleScreen
         {
             get
@@ -27,14 +33,21 @@ namespace Capstone_Chronicles
 
                         for (int i = 0; i < used.Count; i++)
                         {
-                            var index = i;
-                            Scene.fileSelect.Add(new Button($"Slot {used[index]}", menu =>
+                            var index = used[i];
+                            string info = "";
+                            if (SaveLoad.SaveExists(index, HeroManager.PLAYER_SAVE_KEY))
                             {
-                                slot = used[index];
+                                var stats = SaveLoad.Load<Actor.StatsStruct>(index, HeroManager.PLAYER_SAVE_KEY);
+                                info = $" [{stats.Name}: LV {stats.Level}]";
+                            }
+
+                            Scene.fileSelect.Add(new Button($"Slot {index}" + info, menu =>
+                            {
+                                slot = index;
                             }), false);
                         }
 
-                        GameManager.ActiveInteractiveElement.SetActive(false);
+                        GameManager.ActiveInteractiveElement?.SetActive(false);
                         Scene.fileSelect.SetActive(true);
 
                         GameManager.LoadGame(slot);
@@ -65,9 +78,16 @@ namespace Capstone_Chronicles
             }
         }
 
+        /// <summary>
+        /// The main out-of-battle Scene
+        /// </summary>
         public static OverworldScene Overworld { get; } = new OverworldScene(AreaManager.SorecordForest);
 
-
+        /// <summary>
+        /// Starts a battle against specific enemies
+        /// </summary>
+        /// <param name="encounter">The encounter data to pull from</param>
+        /// <returns></returns>
         public static BattleScene GetBattleScene(Encounter encounter)
         {
 
@@ -76,6 +96,9 @@ namespace Capstone_Chronicles
             return new BattleScene(encounter);
         }
 
+        /// <summary>
+        /// The Scene containing the end of the game
+        /// </summary>
         public static Scene EndingScene {
             get
             {
@@ -98,7 +121,7 @@ The rumors were true, it really is a portal!
  ▀█▀ █▄█ ▄▀▄ █▄ █ █▄▀ ▄▀▀   █▀ ▄▀▄ █▀▄   █▀▄ █   ▄▀▄ ▀▄▀ █ █▄ █ ▄▀ 
   █  █ █ █▀█ █ ▀█ █ █ ▄██   █▀ ▀▄▀ █▀▄   █▀  █▄▄ █▀█  █  █ █ ▀█ ▀▄█
 
-
+    -Cykie Productions
 ", false, -1);
                     Program.Exit();
                 },

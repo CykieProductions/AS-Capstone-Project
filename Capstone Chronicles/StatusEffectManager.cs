@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-//TODO remove this
-//using static Capstone_Chronicles.Program;/*
 using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Contains data on all normal <see cref="StatusEffect"/>s
+    /// </summary>
     public class StatusEffectManager
     {
         static StatusEffect poisoned = new StatusEffect("POISONED", 5, 8, (target) =>
@@ -43,6 +44,8 @@ namespace Capstone_Chronicles
             print(target.Name + " is asleep");
             Console.ForegroundColor = ConsoleColor.White;
 
+            target.ModifyStamina(RNG.RandomInt(1, (int)(target.MaxSp / 10f).Clamp(5, 20)));
+
             target.nextAction = SkillManager.Sleep;
             target.targets.Clear();
         }, "{0} got put in a deep sleep", "{0} woke up");
@@ -68,7 +71,7 @@ namespace Capstone_Chronicles
 
             if (RNG.OneInThree)//ignore command and do a normal attack on anyone
             {
-                target.nextAction = new Skill<Actor, Actor>(SkillManager.Attack);
+                target.nextAction = SkillManager.Attack;
                 target.nextAction.targetType = SkillBase.TargetGroup.ANYONE;
                 target.targets.Clear();
             }
@@ -77,12 +80,11 @@ namespace Capstone_Chronicles
                 if (target.targets.Count == 1 && (target.nextAction.targetType == SkillBase.TargetGroup.ONE_OPPONENT
                     || target.nextAction.targetType == SkillBase.TargetGroup.ONE_ALLY))//Hit anyone
                 {
-                    target.nextAction = new Skill<Actor, Actor>(target.nextAction as Skill<Actor, Actor>);
                     target.nextAction.targetType = SkillBase.TargetGroup.ANYONE;
                 }
                 else//Target the opposite group from the intended targets
                 {
-                    target.nextAction = new Skill<Actor, List<Actor>>(target.nextAction as Skill<Actor, List<Actor>>);
+                    //target.nextAction = new Skill<Actor, List<Actor>>(target.nextAction as Skill<Actor, List<Actor>>);
                     if (target.nextAction.targetType == SkillBase.TargetGroup.ALL_ALLIES)
                         target.nextAction.targetType = SkillBase.TargetGroup.ALL_OPPONENTS;
                     else if (target.nextAction.targetType == SkillBase.TargetGroup.ALL_OPPONENTS)
@@ -91,20 +93,39 @@ namespace Capstone_Chronicles
                 target.targets.Clear();
             }
 
-        }, "{0} got confused", "{0} came to their senses");//change name to delusional?
+        }, "{0} got confused", "{0} came to their senses");
 
-
-        //public static StatusEffect NONE { get { return none; } }
+        /// <summary>
+        /// A condition that inflicts damage
+        /// </summary>
         public static StatusEffect POISONED { get { return poisoned; } }
+        /// <summary>
+        /// A condition that inflicts <see cref="ElementManager.FIRE"/> damage
+        /// </summary>
         public static StatusEffect FLAMING { get { return flaming; } }
+        /// <summary>
+        /// A condition that stops an Actor from acting, but recovers a bit of their SP
+        /// </summary>
         public static StatusEffect SLEEPING { get { return sleeping; } }
+        /// <summary>
+        /// A condition that may stop an Actor from acting
+        /// </summary>
         public static StatusEffect PARALYZED { get { return paralyzed; } }
+        /// <summary>
+        /// A condition that may scramble an Actors actions and targets
+        /// </summary>
         public static StatusEffect CONFUSED { get { return confused; } }
     }
 
-    [Serializable]
+
+    /// <summary>
+    /// Contains data on what to do to an actor when they are inflicted
+    /// </summary>
     public class StatusEffect
     {
+        /// <summary>
+        /// The name of the condition
+        /// </summary>
         public string Name;
 
         Action<Actor> turnAction;
@@ -113,11 +134,21 @@ namespace Capstone_Chronicles
         int maxPossibleTurns = 8;
 
         int turnLimit;
-        public int turnsActive = 0;
+        private int turnsActive = 0;
 
         string inflictText = "{0} isn't feeling well";
         string removeText = "{0} went back to normal";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatusEffect"/> class.
+        /// </summary>
+        /// <param name="n">The name</param>
+        /// <param name="minPT">The minimum possible turns to stay</param>
+        /// <param name="maxPT">The maximum possible turns to stay</param>
+        /// <param name="tAction">The action to trigger each turn</param>
+        /// <param name="iText">The text to display after infliction</param>
+        /// <param name="rtext">The text to display after recovery</param>
+        /// <param name="recAction">An extra action to trigger after recovery</param>
         public StatusEffect(string n, int minPT, int maxPT, Action<Actor> tAction, string iText = "{0} isn't feeling well", string rtext = "{0} went back to normal", Action<Actor>? recAction = null)
         {
             Name = n;
@@ -134,6 +165,10 @@ namespace Capstone_Chronicles
 
             recoverAction = recAction;
         }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatusEffect"/> class based on another
+        /// </summary>
+        /// <param name="dupe">The StatusEffect to clone</param>
         public StatusEffect(StatusEffect dupe)
         {
             Name = dupe.Name;
@@ -195,6 +230,10 @@ namespace Capstone_Chronicles
             return successful;
         }
 
+        /// <summary>
+        /// Triggers <see cref="turnAction"/> and increments the turn counter
+        /// </summary>
+        /// <param name="target">The target to trigger on</param>
         public void PerformAction(Actor target)
         {
             if (target.Hp <= 0)
@@ -205,6 +244,12 @@ namespace Capstone_Chronicles
             turnsActive++;
             //Check for duration at the end of turn
         }
+        /// <summary>
+        /// Removes the effect if it's been active for enough turns
+        /// </summary>
+        /// <param name="target">The target to remove from</param>
+        /// <param name="forceRemove">If true, removes the effect no matter what</param>
+        /// <param name="activateRecoverAction">If true, trigger the special recovery action if it exists</param>
         public void TryRemoveEffect(Actor target, bool forceRemove = false, bool activateRecoverAction = true)
         {
             if (target.Hp <= 0)
@@ -218,8 +263,8 @@ namespace Capstone_Chronicles
                 print(string.Format(removeText, target.Name));
                 Console.ForegroundColor = ConsoleColor.White;
 
-                if (activateRecoverAction && recoverAction != null)
-                    recoverAction.Invoke(target);
+                if (activateRecoverAction)
+                    recoverAction?.Invoke(target);
             }
         }
 

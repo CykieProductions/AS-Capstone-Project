@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Contains data on all Areas
+    /// </summary>
     public static class AreaManager
     {
+        /// <summary>
+        /// A list of all <see cref="Area"/>s in the game
+        /// </summary>
         public static readonly List<Area> areaList = new();
         public static Area SorecordForest { get; private set; }
             = new Area("Sorecord Forest", 6, encounters: new()
@@ -97,6 +103,9 @@ namespace Capstone_Chronicles
         }
     }
 
+    /// <summary>
+    /// Condensed <see cref="Area"/> data for saving and loading
+    /// </summary>
     public struct AreaData
     {
         [JsonInclude]
@@ -113,6 +122,10 @@ namespace Capstone_Chronicles
             this.started = started;
             this.completed = completed;
         }
+        /// <summary>
+        /// Constructs AreaData from an <see cref="Area"/> object
+        /// </summary>
+        /// <param name="area">The Area object</param>
         public AreaData(Area area)
         {
             progress = area.Progress;
@@ -121,24 +134,55 @@ namespace Capstone_Chronicles
         }
     }
 
+    /// <summary>
+    /// Contains data on an in-game location
+    /// </summary>
     public class Area
     {
+        /// <summary>
+        /// The Area that you are currently in
+        /// </summary>
         public static Area Current { get; private set; }
+        /// <summary>
+        /// The area to load when you finish this one
+        /// </summary>
         public Area? NextArea { get; set; }
 
+        /// <summary>
+        /// The name of the area
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// How many encounters are in the area
+        /// </summary>
         public int Length { get; private set; }
-
+        /// <summary>
+        /// How close are you to the end of the area
+        /// </summary>
         public int Progress { get; private set; }
 
         private List<Encounter> encounters;
         private Dictionary<int, Encounter> fixedEncounters;
 
+        /// <summary>
+        /// Have you reached this area?
+        /// </summary>
         public bool Started { get; private set; } = false;
+        /// <summary>
+        /// Have you completed this area?
+        /// </summary>
         public bool Completed { get; private set; } = false;
 
         private event Action? FinishArea;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Area"/> class.
+        /// </summary>
+        /// <param name="name">The name of the area</param>
+        /// <param name="length">The amount of encounters</param>
+        /// <param name="encounters">The types of encounters</param>
+        /// <param name="fixedEncounters">The fixed encounters</param>
+        /// <param name="finishAction">The action to trigger when finishing the area</param>
         public Area(string name, int length, List<Encounter> encounters, Dictionary<int, Encounter>? fixedEncounters,
             Action? finishAction = null)
         {
@@ -162,9 +206,7 @@ namespace Capstone_Chronicles
         {
             foreach (var hero in HeroManager.Party)
             {
-                hero.SetHealth(hero.MaxHp);
-                hero.SetStamina(hero.MaxSp);
-                hero.statusEffects.Clear();
+                hero.FullRestore();
             }
         }
 
@@ -174,6 +216,11 @@ namespace Capstone_Chronicles
                 Current = (cur as OverworldScene).Area;
         }
 
+        /// <summary>
+        /// Make or lose progress
+        /// </summary>
+        /// <param name="i">The amount to change by</param>
+        /// <param name="directSet">If true, set progress to <paramref name="i"/></param>
         public void ModifyProgress(int i, bool directSet = false)
         {
             Started = true;
@@ -209,6 +256,10 @@ namespace Capstone_Chronicles
             }
         }
 
+        /// <summary>
+        /// Randomly gets an encounter from the list
+        /// </summary>
+        /// <returns>An Encounter</returns>
         public Encounter GetRandomEncounter()
         {
             var valid = encounters.ToList();
@@ -218,6 +269,11 @@ namespace Capstone_Chronicles
             return valid.GetRandomElement();
         }
 
+        /// <summary>
+        /// Tries the get a fixed encounter based on your progress
+        /// </summary>
+        /// <param name="encounter">The fixed encounter</param>
+        /// <returns>A bool: true if successful</returns>
         public bool TryGetFixedEncounter(out Encounter? encounter)
         {
             fixedEncounters.TryGetValue(Progress, out encounter);
@@ -228,13 +284,13 @@ namespace Capstone_Chronicles
             return true;
         }
 
-        void Save(int slot)
+        private void Save(int slot)
         {
             var data = new AreaData(this);
             SaveLoad.Save(data, slot, Name);
         }
 
-        void Load(int slot)
+        private void Load(int slot)
         {
             var data = SaveLoad.Load<AreaData>(slot, Name);
 

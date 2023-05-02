@@ -24,6 +24,9 @@ namespace Capstone_Chronicles
         (GrowthCurve curve, float scalar) speedInfo;
         (GrowthCurve curve, float scalar) expInfo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatGrowth"/> class with information on how the stats should increase
+        /// </summary>
         public StatGrowth(
             (GrowthCurve curve, float scalar) _hpInfo,
             (GrowthCurve curve, float scalar) _spInfo,
@@ -54,6 +57,12 @@ namespace Capstone_Chronicles
             Hero.AfterInit -= Init;
         }
 
+        /// <summary>
+        /// Increases a stat based on an algorithm
+        /// </summary>
+        /// <param name="statType">The type of stat to increase</param>
+        /// <param name="showText">If true, display text</param>
+        /// <returns>An int: the amount to add</returns>
         public int StatGain(Actor.StatType statType, bool showText = true)
         {
             string statName = statType.ToString().Replace('_', ' ');
@@ -108,6 +117,13 @@ namespace Capstone_Chronicles
             return (int)amount;
         }
 
+        /// <summary>
+        /// Calculates the base increase based on a supplied curve
+        /// </summary>
+        /// <param name="growthType">The curve type</param>
+        /// <param name="stat">The stat</param>
+        /// <param name="scalar">The scalar</param>
+        /// <returns>A float: the amount to increase by</returns>
         public float CalculateBaseIncrease(GrowthCurve growthType, int stat, float scalar)
         {
             float result = stat;

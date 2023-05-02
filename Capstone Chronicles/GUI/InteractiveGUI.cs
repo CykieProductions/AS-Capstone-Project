@@ -7,21 +7,38 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles.GUI
 {
+
+    /// <summary>
+    /// A <see cref="GUIComponent"/> that the user can interact with
+    /// </summary>
     public abstract class InteractiveGUI : GUIComponent
     {
+        /// <summary>
+        /// Info on what the user is expected to do
+        /// </summary>
         public Label? Prompt { get; protected set; }
 
         /// <summary>
         /// The interactive element will close unless this is set false by the ending behavior
         /// </summary>
         public bool closeAfterConfirm = true;
+        /// <summary>
+        /// The event to trigger when closing the GUI element
+        /// </summary>
         protected Action? OnClose = null;
 
-        protected InteractiveGUI(Label? inPrompt, bool inEnabled, Action onClose = null)
+        /// <summary>
+        /// Constructs a new <see cref="InteractiveGUI"/>
+        /// </summary>
+        /// <param name="inPrompt">The prompt to display</param>
+        /// <param name="inEnabled">If true, display</param>
+        /// <param name="onClose">The action to trigger when closing</param>
+        protected InteractiveGUI(Label? inPrompt, bool inEnabled, Action? onClose = null)
             : base(inEnabled)
         {
             Prompt = inPrompt;
             Prompt?.TryAttachToInteractiveGUI(this);
+            OnClose = onClose;
         }
 
         /// <summary>
@@ -38,6 +55,7 @@ namespace Capstone_Chronicles.GUI
             GameManager.ActiveInteractiveElement = this;
         }
 
+        ///<inheritdoc/>
         public override void SetActive(bool state, bool refresh = true)
         {
             if (state == false)
@@ -72,9 +90,18 @@ namespace Capstone_Chronicles.GUI
     /// </summary>
     public class InputField : InteractiveGUI
     {
+        /// <summary>
+        /// The inputted string
+        /// </summary>
         public string Input { get; protected set; } = "";
         readonly Action<string> OnSend;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InputField"/> class.
+        /// </summary>
+        /// <param name="inPrompt">The prompt</param>
+        /// <param name="onSend">The event to trigger when sending your input</param>
+        /// <param name="inEnabled">If true, in display</param>
         public InputField(Label? inPrompt, Action<string> onSend, bool inEnabled = true) 
             : base (inPrompt, inEnabled)
         {
@@ -116,6 +143,9 @@ namespace Capstone_Chronicles.GUI
         List<Button> options;
 
         int selectedIndex = 0;
+        /// <summary>
+        /// The index of the currently selected option
+        /// </summary>
         public int SelectedIndex { get => selectedIndex;
             set
             {
@@ -124,6 +154,9 @@ namespace Capstone_Chronicles.GUI
             }
         }
 
+        /// <summary>
+        /// The event to trigger when changing selections
+        /// </summary>
         public readonly Action<Menu>? OnMove = null;
 
         private readonly bool wrapAround = false;
@@ -131,6 +164,18 @@ namespace Capstone_Chronicles.GUI
         private readonly int rowLimit = 0;//Zero means no limit
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Menu"/> class.
+        /// </summary>
+        /// <param name="inPrompt">The prompt</param>
+        /// <param name="inOptions">The options</param>
+        /// <param name="wrap">If true, enable wrapping around to the first or last option</param>
+        /// <param name="remember">If true, continue the last selected option when redisplayed</param>
+        /// <param name="inRowLimit">The row limit</param>
+        /// <param name="moveAction">The event to trigger when changing selections</param>
+        /// <param name="onClose">The event to trigger when closing</param>
+        /// <param name="altSelectColors">The alternate selection colors</param>
+        /// <param name="inEnabled">If true, in display</param>
         public Menu(Label? inPrompt, List<Button> inOptions, bool wrap = false, bool remember = false, int inRowLimit = 0,
             Action<Menu>? moveAction = null, Action? onClose = null, ColorSet? altSelectColors = null, bool inEnabled = true)
             : base(inPrompt, inEnabled)
@@ -157,6 +202,11 @@ namespace Capstone_Chronicles.GUI
             return (Menu)MemberwiseClone();
         }
 
+        /// <summary>
+        /// Get the option at an index
+        /// </summary>
+        /// <param name="i">The index</param>
+        /// <returns>A Button</returns>
         public Button GetOptionAt(int i)
         {
             if (options.Count == 0)
@@ -164,16 +214,30 @@ namespace Capstone_Chronicles.GUI
 
             return options[i.Clamp(0, options.Count - 1)];
         }
+
+        /// <summary>
+        /// Copies the options from another Menu
+        /// </summary>
+        /// <param name="menu"></param>
         public void SetOptions(Menu menu)
         {
             options = menu.options.ToList();
         }
+        /// <summary>
+        /// Add an option
+        /// </summary>
+        /// <param name="button">The Button to add</param>
+        /// <param name="refresh">If true, refresh the scene immediately</param>
         public void Add(Button button, bool refresh)
         {
             options.Add(button);
             if (refresh)
                 ParentScreen.Refresh();
         }
+        /// <summary>
+        /// Adds a list of Buttons
+        /// </summary>
+        /// <param name="buttons">The Buttons to add</param>
         public void Add(params Button[] buttons)
         {
             if (buttons.Length == 1)
@@ -182,18 +246,34 @@ namespace Capstone_Chronicles.GUI
                 options.AddRange(buttons);
             ParentScreen.Refresh();
         }
+
+        /// <summary>
+        /// Removes an option by name
+        /// </summary>
+        /// <param name="name">The name of the Button to remove</param>
+        /// <param name="refresh">If true, refresh the scene immediately</param>
         public void Remove(string name, bool refresh)
         {
             options.RemoveAll(x => x.Text == name);
             if (refresh)
                 ParentScreen.Refresh();
         }
+        /// <summary>
+        /// Removes an option at an index
+        /// </summary>
+        /// <param name="index">The index of the Button to remove</param>
+        /// <param name="refresh">If true, refresh the scene immediately</param>
         public void Remove(int index, bool refresh)
         {
             options.RemoveAt(index);
             if (refresh)
                 ParentScreen.Refresh();
         }
+
+        /// <summary>
+        /// Removes all options
+        /// </summary>
+        /// <param name="refresh">If true, refresh the scene immediately</param>
         public void ClearOptions(bool refresh = true)
         {
             options.Clear();
@@ -352,7 +432,7 @@ namespace Capstone_Chronicles.GUI
                     else
                         continue;
                 }
-                else if (left)//todo tweak this to match Right Key behavior
+                else if (left)
                 {
                     if (wrapAround && selectedIndex - rowLimit < 0)//wrap
                     {

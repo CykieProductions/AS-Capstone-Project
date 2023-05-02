@@ -1,23 +1,17 @@
 ﻿using Pastel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Xml.Linq;
 using static Capstone_Chronicles.Scene;
 
 namespace Capstone_Chronicles
 {
     /// <summary>
-    /// Actors participate in battles. 
+    /// Actors are entities that participate in battles. 
     /// </summary>
     public abstract partial class Actor
     {
         //Contains nested struct*/ StatsStruct
-        //Contains nested class*/ StatGrowth
 
         /*? Why are the stats here:
-         * I originally used a Stats struct for this, but that meant either making every setter 
+         * I originally used the Stats struct for this, but that meant either making every setter 
          * public, or moving leveling logic into the struct, which would defeat the purpose.
          * Only Actors need access to setting stats anyway, so I just moved the stats here.
          */
@@ -43,22 +37,43 @@ namespace Capstone_Chronicles
 
         public string Name { get; set; } = "";
         public Element Element { get; set; }
+        /// <summary>
+        /// Is this actor guarding?
+        /// </summary>
         public bool isGuarding;
 
+        /// <summary>
+        /// This actor's next action
+        /// </summary>
         public SkillBase? nextAction;
+        /// <summary>
+        /// Who this actor is going to use their next action on
+        /// </summary>
         public List<Actor> targets = new List<Actor>();
 
         /// <summary>All current skills</summary>
         public List<SkillBase> skills = new List<SkillBase>();
         /// <summary>Skills that can be learned by leveling up</summary>
         protected Dictionary<int, SkillBase> levelUpSkillDictionary;
-
+        /// <summary>
+        /// All status effects that are inflicted on this actor
+        /// </summary>
         public List<StatusEffect?> statusEffects = new();
 
-        //Constants
+        //! Constants
+        /// <summary>
+        /// The highest level an actor can be
+        /// </summary>
         public const int MAX_LEVEL = 100;
+        /// <summary>
+        /// How many status effects an actor can have at once
+        /// </summary>
         public const float EFFECT_CAPACITY = 3;
 
+        /// <summary>
+        /// The basic actions to take when constructing a new <see cref="Actor"/>
+        /// <para>see actual constructor for details</para>
+        /// </summary>
         protected void _ConstructionHelper(string inName, Element inElement, StatsStruct inStats,
             Dictionary<int, SkillBase> inSkillDict)
         {
@@ -111,11 +126,12 @@ namespace Capstone_Chronicles
         }
 
         /// <summary>
-        /// Performs various calculations and then changes HP.
+        /// Performs various calculations and then changes the Actor's HP.
         /// </summary>
         /// <param name="amount">The base value to change by</param>
         /// <param name="skillUsed">The skill causing the change</param>
         /// <param name="atkElmt">Overrides the normal element with this one</param>
+        /// <param name="ignoreGuard">Should the action factor in weather or not the actor is guarding</param>
         /// <returns>The actual amount the HP changed by</returns>
         public virtual int ModifyHealth(int amount, SkillBase? skillUsed = null, Element? atkElmt = null, bool ignoreGuard = false)
         {
@@ -218,11 +234,12 @@ namespace Capstone_Chronicles
 
             return Hp - startHp;
         }
-        public void SetHealth (int value)
-        {
-            Hp = value.Clamp(0, MaxHp);
-        }
 
+
+        /// <summary>
+        /// Add or Subtracts from the Actor's SP
+        /// </summary>
+        /// <param name="value">The amount to add or subtract</param>
         public virtual void ModifyStamina(int value)
         {
             if (value > 0)
@@ -237,9 +254,15 @@ namespace Capstone_Chronicles
 
             Sp = (Sp + value).Clamp(0, MaxSp);
         }
-        public void SetStamina(int value)
+
+        /// <summary>
+        /// Max out the Actor's HP and SP and also remove any status effects
+        /// </summary>
+        public void FullRestore()
         {
-            Sp = value.Clamp(0, MaxSp);
+            Hp = MaxHp;
+            Sp = MaxSp;
+            statusEffects.Clear();
         }
     }
 
@@ -249,15 +272,32 @@ namespace Capstone_Chronicles
     public class Hero : Actor
     {
         private readonly string? saveKey;
+        /// <summary>
+        /// The amount of EXP needed to level up
+        /// </summary>
         public int NeededExp { get; private set; } = 4;
+        /// <summary>
+        /// Information on how much the Hero's stats increase each level up
+        /// </summary>
         public StatGrowth GrowthInfo { get; private set; }
+        /// <summary>
+        /// An event that triggers after an actor is constructed
+        /// </summary>
         public static event Action<StatGrowth, Actor>? AfterInit;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Hero"/> class.
+        /// </summary>
+        /// <param name="inName">The name</param>
+        /// <param name="inStats">The stats</param>
+        /// <param name="inGrowthInfo">The growth info</param>
+        /// <param name="inSkillDict">The skill dictionary used to learn skills on level up</param>
+        /// <param name="inElement">This actor's element</param>
+        /// <param name="saveKey">A unique identifier for this actor's save data</param>
         public Hero(string inName, StatsStruct inStats, StatGrowth inGrowthInfo, 
             Dictionary<int, SkillBase> inSkillDict, Element? inElement = null, string? saveKey = null) 
             : base(inName, inElement ?? ElementManager.NORMAL, inStats, inSkillDict)
         {
-            //TODO implement StatGrowth
             GrowthInfo = inGrowthInfo;
 
             SortSkills();
@@ -293,6 +333,11 @@ namespace Capstone_Chronicles
                 ThenBy(x => x.targetType).ThenBy(x => x.Cost).ToList();
         }
 
+        /// <summary>
+        /// Adds a new skill to this actor's list of usable skills
+        /// </summary>
+        /// <param name="newSkill">The new skill</param>
+        /// <param name="display">If true, display what the skill is to the player</param>
         public override void LearnSkill(SkillBase newSkill, bool display = true)
         {
             if (!skills.Contains(newSkill)) //Heroes shouldn't have duplicate skills, but enemies can
@@ -306,8 +351,17 @@ namespace Capstone_Chronicles
         /// <summary>
         /// The hero will attempt to level up as many times as they can
         /// </summary>
+        /// <param name="displayStatGain">Should the stat increases be shown to the player?</param>
+        /// <param name="displayNewSkill">Should newly learned skills be shown to the player?</param>
         public void TryLevelUp(bool displayStatGain = true, bool displayNewSkill = true)
         {
+            if (Level == MAX_LEVEL)
+            {
+                Exp = 0;
+                NeededExp = 0;
+                return;
+            }
+
             while (Exp >= NeededExp)
             {
                 Level++;
@@ -358,6 +412,15 @@ namespace Capstone_Chronicles
         /// </summary>
         public Func<SkillBase> decideTurnAction;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Hero"/> class.
+        /// </summary>
+        /// <param name="inName">The name</param>
+        /// <param name="inStats">The stats</param>
+        /// <param name="inSkills">The skills to start with</param>
+        /// <param name="inSkillDict">The skill dictionary used to learn skills on level up</param>
+        /// <param name="ai">Custom behavior for deciding the next action</param>
+        /// <param name="inElement">This actor's element</param>
         public Enemy(string inName, Element inElement, StatsStruct inStats, List<SkillBase>? inSkills,
             Dictionary<int, SkillBase>? inSkillDict = null, Func<SkillBase>? ai = null)
             : base(inName, inElement, inStats, inSkillDict ?? new())
@@ -377,9 +440,10 @@ namespace Capstone_Chronicles
         /// <summary>
         /// Create a duplicate of an enemy, but with a different name and/or AI
         /// </summary>
-        /// <param name="enemy"></param>
-        /// <param name="inName"></param>
-        /// <param name="ai"></param>
+        /// <param name="enemy">The enemy to base this one off of</param>
+        /// <param name="lv">The new level | uses the original level if less than 1</param>
+        /// <param name="inName">A new name</param>
+        /// <param name="ai">Custom behavior for deciding the next action</param>
         public Enemy(Enemy enemy, int lv = 0, string? inName = null, Func<SkillBase>? ai = null)
             : base(inName ?? enemy.Name, enemy.Element, new StatsStruct(enemy, lv), enemy.levelUpSkillDictionary)
         {
@@ -396,7 +460,7 @@ namespace Capstone_Chronicles
                 decideTurnAction = () => { return DecideTurnAction(); };
         }
 
-        void ScaleToLevel(int oldLv, int newLv)
+        private void ScaleToLevel(int oldLv, int newLv)
         {
             int dif = newLv - oldLv;
             if (dif == 0)
@@ -421,7 +485,7 @@ namespace Capstone_Chronicles
             Exp = (Exp + (int)(dif * Exp * .6f)).Clamp(4, int.MaxValue);
         }
 
-        SkillBase DecideTurnAction()
+        private SkillBase DecideTurnAction()
         {
             var skillPool = skills.ToList();//copy of the original
             foreach (var skill in skills)
@@ -436,6 +500,12 @@ namespace Capstone_Chronicles
 
             return skillPool[randInt];
         }
+
+        /// <summary>
+        /// Chooses an Actor to target
+        /// </summary>
+        /// <param name="actorPool">The list of possible targets</param>
+        /// <param name="targetType">The type and amount of Actors to target</param>
         public void ChooseTarget(List<Actor> actorPool, 
             SkillBase.TargetGroup targetType = SkillBase.TargetGroup.ONE_OPPONENT)
         {

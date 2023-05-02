@@ -7,17 +7,41 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Stores data on the enemies and rules for a battle
+    /// </summary>
     public class Encounter
     {
+        /// <summary>
+        /// The unique save key for this encounter
+        /// </summary>
         public string? SaveKey { get; private set; }
 
         private List<Enemy> enemies;
         (int min, int max) amountRange = (0, 0);
+
+        /// <summary>
+        /// Can you flee from this encounter?
+        /// </summary>
         public bool CanBeEscaped { get; private set; } = true;
+        /// <summary>
+        /// Can this encounter be repeated once beaten?
+        /// </summary>
         public bool CanBeRepeated { get; private set; } = true;
 
+        /// <summary>
+        /// Has this encounter been beaten before?
+        /// </summary>
         public bool hasBeenBeat = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Encounter"/> class.
+        /// </summary>
+        /// <param name="enemies">The types of enemies</param>
+        /// <param name="numOfEnemies">The min and max number of enemies to spawn | Spawns the exact list if null</param>
+        /// <param name="canBeEscaped">If true, can be escaped</param>
+        /// <param name="canBeRepeated">If true, can be repeated</param>
+        /// <param name="saveKey">The unique save key</param>
         public Encounter(List<Enemy> enemies, (int min, int max)? numOfEnemies = null, bool canBeEscaped = true,
             bool canBeRepeated = true, string? saveKey = null)
         {
@@ -42,6 +66,13 @@ namespace Capstone_Chronicles
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Encounter"/> class.
+        /// </summary>
+        /// <param name="canBeEscaped">If true, can be escaped</param>
+        /// <param name="canBeRepeated">If true, can be repeated</param>
+        /// <param name="saveKey">The unique save key</param>
+        /// <param name="enemies">The enemies to spawn</param>
         public Encounter(bool canBeEscaped, bool canBeRepeated, string? saveKey, params Enemy[] enemies)
         {
             this.enemies = enemies.ToList();
@@ -56,7 +87,10 @@ namespace Capstone_Chronicles
             }
         }
 
-        //! NOTICE: even though the list is a copy, the actual enemies themselves aren't. Issues may occur
+        /// <summary>
+        /// Gets the enemies to spawn
+        /// </summary>
+        /// <returns>A list of Enemies.</returns>
         public List<Enemy> GetEnemies()
         {
             //! The actual enemies must be copies
@@ -85,7 +119,7 @@ namespace Capstone_Chronicles
             return result;
         }
 
-        void Save(int slot)
+        private void Save(int slot)
         {
             if (string.IsNullOrEmpty(SaveKey))
                 return;
@@ -93,7 +127,7 @@ namespace Capstone_Chronicles
             SaveLoad.Save(hasBeenBeat, slot, SaveKey);
         }
 
-        void Load(int slot)
+        private void Load(int slot)
         {
 
             if (string.IsNullOrEmpty(SaveKey))

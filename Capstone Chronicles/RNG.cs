@@ -6,15 +6,33 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Contains functions for randomization
+    /// </summary>
     public static class RNG
     {
         public static Random Rand { get; private set; } = new Random(DateTime.Now.Millisecond);
 
         // Presets
+        /// <summary>
+        /// Is true half the time
+        /// </summary>
         public static bool OneInTwo { get => Chance(0.5f); }
+        /// <summary>
+        /// Is true a quarter of the time
+        /// </summary>
         public static bool OneInFour { get => Chance(0.25f); }
+        /// <summary>
+        /// Is true three quarters of the time
+        /// </summary>
         public static bool ThreeInFour { get => Chance(0.75f); }
+        /// <summary>
+        /// Is true a third of the time
+        /// </summary>
         public static bool OneInThree { get => Chance(1f / 3f); }
+        /// <summary>
+        /// Is true two thirds of the time
+        /// </summary>
         public static bool TwoInThree { get => Chance(2f / 3f); }
 
         /// <summary>

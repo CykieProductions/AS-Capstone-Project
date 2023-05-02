@@ -4,15 +4,19 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-//TODO remove this
-//using static Capstone_Chronicles.Program;/*
 using static Capstone_Chronicles.Scene;//*/
 
 namespace Capstone_Chronicles
 {
+    /// <summary>
+    /// Contains data on all normal Skills
+    /// </summary>
     public static class SkillManager
     {
-        public static event Func<string, SkillBase?> callForSkill;
+        /// <summary>
+        /// Used to get a <see cref="SkillBase"/> from its name
+        /// </summary>
+        public static event Func<string, SkillBase?>? CallForSkill;
 
         #region All Skills
         public static Skill<Actor> Skip_Turn { get; private set; }
@@ -30,6 +34,7 @@ namespace Capstone_Chronicles
 
         //Testing
         public static Skill<Actor, List<Actor>> Damage_Allies_Test { get; private set; }
+        public static Skill<Actor, Actor> Confuse_Ally_Test { get; private set; }
         public static Skill<Actor, List<Actor>> Poison_Allies_Test { get; private set; }
         public static Skill<Actor, List<Actor>> Ignite_Allies_Test { get; private set; }
         public static Skill<Actor, List<Actor>> Restore_SP_Allies_Test { get; private set; }
@@ -140,7 +145,7 @@ namespace Capstone_Chronicles
 
 
         #region Construction Helper Functions
-        public static int SpecialAttackFormula(Actor user, int rank = 1, int baseValue = 32, float scalar = 0.36f, bool varyDamage = true)
+        private static int SpecialAttackFormula(Actor user, int rank = 1, int baseValue = 32, float scalar = 0.36f, bool varyDamage = true)
         {
             float rankDamper = 0.75f;
             if (rank >= 3)
@@ -151,7 +156,7 @@ namespace Capstone_Chronicles
                 amount += RNG.RandomInt(-(int)(amount * 0.1f), (int)(amount * 0.1f));
             return amount;
         }
-        public static int BasicAttackFormula(Actor user, int rank = 1, float fluxPercent = 0.1f, int fluxMin = 2)
+        private static int BasicAttackFormula(Actor user, int rank = 1, float fluxPercent = 0.1f, int fluxMin = 2)
         {
             float rankDamper = 1.4f;
 
@@ -165,7 +170,7 @@ namespace Capstone_Chronicles
             return damage;
         }
 
-        public static int SpecialHealingFormula(Actor user, int rank = 1, int baseValue = 30, float scalar = 1f)
+        private static int SpecialHealingFormula(Actor user, int rank = 1, int baseValue = 30, float scalar = 1f)
         {
             float rankDamper = 1f;
             if (rank >= 3)
@@ -174,7 +179,7 @@ namespace Capstone_Chronicles
             return (int)(baseValue * Math.Sqrt(rank * rankDamper).Clamp(1, 50) * scalar * (rank * 0.75f).Clamp(1, 50));
         }
 
-        public static void OutOfSP(string n)
+        private static void OutOfSP(string n)
         {
             print($"{n} didn't have enough SP");
         }
@@ -287,6 +292,28 @@ namespace Capstone_Chronicles
                     OutOfSP(user.Name);
             }
             , 0, SkillBase.TargetGroup.ALL_ALLIES, skillType: SkillBase.ActionType.HEALING);
+
+            Confuse_Ally_Test = new Skill<Actor, Actor>("Confuse Allies", (user, target) =>
+            {
+                var curSkill = Confuse_Ally_Test;
+                if (user.Sp >= curSkill.Cost)
+                {
+                    print($"{user.Name} used {curSkill.Name}");
+
+                    if (RNG.Chance(1f))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        StatusEffectManager.CONFUSED.TryInflict(target);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
+                    user.Sp -= curSkill.Cost;
+                }
+                else
+                    OutOfSP(user.Name);
+            }
+            , 0, SkillBase.TargetGroup.ONE_ALLY, ElementManager.OMNI, SkillBase.ActionType.HEALING);
+
             Poison_Allies_Test = new Skill<Actor, List<Actor>>("Poison Allies", (user, targets) =>
             {
                 var curSkill = Poison_Allies_Test;
@@ -313,6 +340,7 @@ namespace Capstone_Chronicles
                     OutOfSP(user.Name);
             }
             , 0, SkillBase.TargetGroup.ALL_ALLIES, ElementManager.OMNI, SkillBase.ActionType.HEALING);
+
             Ignite_Allies_Test = new Skill<Actor, List<Actor>>("Ignite Allies", (user, targets) =>
             {
                 var curSkill = Ignite_Allies_Test;
@@ -1437,14 +1465,14 @@ namespace Capstone_Chronicles
         /// Uses the inputted name to request a reference to a skill
         /// </summary>
         /// <param name="name"></param>
-        /// <returns>The requested skill or null</returns>
+        /// <returns>A SkillBase: the requested skill or null</returns>
         public static SkillBase? GetSkillByName(string? name)
         {
-            if (name == null)
+            if (name == null || CallForSkill == null)
                 return null;
 
             SkillBase? skill = null;
-            var delegates = callForSkill.GetInvocationList();
+            var delegates = CallForSkill.GetInvocationList();
 
             foreach (var del in delegates)
             {

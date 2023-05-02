@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Capstone_Chronicles
 {
-    //TODO Implement class
-    internal class EnemyFactory
+    /// <summary>
+    /// Contains data for all <see cref="Enemy"/> objects 
+    /// </summary>
+    internal static class EnemyFactory
     {
         public static Enemy Test { get =>
                 new("Test", ElementManager.NORMAL, new Actor.StatsStruct(level: 1, maxHp: 10, maxSp: 20,
